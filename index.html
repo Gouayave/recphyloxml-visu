@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <!-- <textarea id="textAreaXML" rows="8" cols="40"></textarea>
+    <input type="button" value="Visualize" onclick="visualize()"> -->
+
+    <div class="" id="download">
+    </div>
+
+    <div class="" id="draw-zone">
+    </div>
+  </body>
+  <!-- DEPENDENCIES -->
+  <script src="js/lib/jquery-3.2.1.min.js" charset="utf-8"></script>
+  <script src="js/lib/d3.js" charset="utf-8"></script>
+  <script src="js/lib/lodash.js" charset="utf-8"></script>
+  <script src="js/lib/proclaim.js" charset="utf-8"></script>
+
+
+
+  <!-- Tests files -->
+  <script src="js/test/recPhyloXMLExample.js" charset="utf-8"></script>
+  <script src="js/test/treeify.js" charset="utf-8"></script>
+  <!-- SOURCE CODE -->
+  <script src="js/src/recTree.js" charset="utf-8"></script>
+  <script src="js/src/process/parseRecPhyloXML.js" charset="utf-8"></script>
+  <script src="js/src/process/flatTree.js" charset="utf-8"></script>
+  <script src="js/src/process/mergeTreesRecPhyloXML.js" charset="utf-8"></script>
+  <script src="js/src/process/processRecTree.js" charset="utf-8"></script>
+  <!-- <script src="js/src/map/mapRecTree.js" charset="utf-8"></script>
+  <script src="js/src/render/renderRecTree.js" charset="utf-8"></script> -->
+
+  <script type="text/javascript">
+
+
+    var domContainer = document.getElementById("draw-zone");
+    // var textString = $('#textAreaXML').val();
+    var recPhyloXML = exampleXML;
+    recTreeVisu.vizualize(recPhyloXML,domContainer);
+
+  </script>
+</html>

@@ -1,0 +1,54 @@
+/**
+ * @Author: Guillaume GENCE <guigen>
+ * @Date:   2017-06-22T16:15:25+02:00
+ * @Email:  guillaume.gence@univ-lyon1.fr
+ * @Last modified by:   guigen
+ * @Last modified time: 2017-07-05T14:26:06+02:00
+ */
+
+
+body {
+  background-color: white;
+}
+
+.node {
+  cursor: pointer;
+}
+
+.node circle {
+  fill: none;
+  stroke: white;
+  stroke-width: 2px;
+}
+
+.node  {
+  fill: steelblue;
+  font: 12px sans-serif;
+}
+
+.linkCtn {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+.linkDead {
+  fill: none;
+  stroke: tomato;
+  stroke-width: 2px;
+  stroke-opacity: 0.5;
+  stroke-dasharray: 10, 2;
+}
+
+.link {
+  fill: none;
+  stroke-dasharray: none;
+  stroke-opacity: 1;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.cross {
+  fill: green;
+  stroke: green;
+}
