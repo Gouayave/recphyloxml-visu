@@ -1,0 +1,22 @@
+{
+  "name": "visu_recphyloxml_client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gouayave <guillaume.gence@gmail.com>",
+  "license": "ISC",
+  "standard": {
+    "globals": [
+      "d3",
+      "recTreeVisu",
+      "DOMParser",
+      "ActiveXObject",
+      "_",
+      "treeify",
+      "randomColor"
+    ]
+  }
+}
