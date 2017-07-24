@@ -9,20 +9,19 @@
 recTreeVisu.reconcileTrees = function (rootsClades) {
   var rootsHierarchy,
     gnTreesAppendices,
-    allDeadSpecies,
     deadSpecies;
 
   rootsHierarchy = recTreeVisu._computeHierarchy(rootsClades);
 
   gnTreesAppendices = findGnTreesAppendices(rootsHierarchy.rootsRecGnTrees);
 
-  allDeadSpecies = createDeadSpeciesFromGnTreesAppendices(gnTreesAppendices);
-
-  deadSpecies = mergeDeadSpecies(allDeadSpecies);
+  deadSpecies = createDeadSpFromGnTrees(gnTreesAppendices);
 
   addDeadSpecies(rootsClades.rootSpTree, deadSpecies);
 
-  giveSpeciesLocations(rootsClades, gnTreesAppendices);
+  giveSpeciesLocationForAllGn(rootsClades, gnTreesAppendices);
+
+  documentNbGeneAndEventInSpTree(rootsClades);
 
   return rootsClades;
 };
@@ -49,21 +48,11 @@ function findGnTreesAppendices (rootsRecGnTrees) {
   return gnTreesAppendices;
 }
 
-function createDeadSpeciesFromGnTreesAppendices (gnTreesAppendices) {
-  var gnTreeAppendices;
-  var appendicesSpTree = [];
-
-  for (gnTreeAppendices of gnTreesAppendices) {
-    appendicesSpTree.push(createAppendiceSpTreeFromGnTreeOut(gnTreeAppendices));
-  }
-  gnTreesAppendices = _.flatten(appendicesSpTree);
-  return gnTreesAppendices;
-}
-
 // Compare les nouveaux appendices de l'arbre de espèces et les fusionnes pour éviter les doublons out.
-function mergeDeadSpecies (deadSpecies) {
-  var concernSpecies, cs, rootsAppendice;
+function createDeadSpFromGnTrees (deadSpecies) {
+  var concernSpecies, cs;
   var keepSpecies = [];
+  var outSp;
 
   concernSpecies = deadSpecies.map(function (ds) {
     return ds.sourceSpecies;
@@ -71,86 +60,16 @@ function mergeDeadSpecies (deadSpecies) {
   concernSpecies = _.uniq(concernSpecies);
 
   for (cs of concernSpecies) {
-    rootsAppendice = deadSpecies.filter(function (ds) {
-      return ds.sourceSpecies === cs;
-    });
-    keepSpecies.push(keepBiggerTree(rootsAppendice));
+    outSp = {};
+    outSp.sourceSpecies = cs;
+    outSp.name = cs + '_out';
+    keepSpecies.push(outSp);
   }
-
   return keepSpecies;
 }
 
-// BUG Réecrire keepBiggerTree
-// Cette fonction a pour objectif de fusionner les appendices possibles formé grace aux différents arbres de gènes.
-// Pour l'instant la fonction prend l'arbre le plus grand, ce n'est pas la bonne solution.
-// La fonction doit fusionner les appendices.
-function keepBiggerTree (rootsAppendice) {
-  var maxLength = 0;
-  var result, lengthDescendants;
-  for (var tree of rootsAppendice) {
-    tree = d3.hierarchy(tree, function (node) {
-      return node.clade;
-    });
-    lengthDescendants = tree.descendants().length;
-    if (lengthDescendants > maxLength) {
-      result = tree.data;
-    }
-  }
-
-  return result;
-}
-
-// AJOUTER les deadSpecies à l'arbres des espèces
-// LEur donner un nom pour les identifiers et référencer dans l'arbre de gènes
-function addDeadSpecies (rootSpTree, deadSpecies) {
-  var hierarchyDs;
-  var sourceSpecies;
-  var i = 0;
-  var ds;
-
-  // Donne un nom à chaque nouvelle espèces
-  for (ds of deadSpecies) {
-    sourceSpecies = ds.sourceSpecies;
-    hierarchyDs = d3.hierarchy(ds, function (node) {
-      return node.clade;
-    });
-    hierarchyDs.each(function (node) {
-      node.data.name = sourceSpecies + '_' + ++i;
-      delete node.data['eventsRec'];
-    });
-    i = 0;
-  }
-
-  // Rajoute les espèces nouvelles à l'abre des espèces
-  rootSpTree = putAppendicesInSpTree(deadSpecies, rootSpTree);
-  return rootSpTree;
-}
-
-function createAppendiceSpTreeFromGnTreeOut (gnTreeAppendice) {
-  var rootAppendice,
-    rootSpTree,
-    clade;
-
-  gnTreeAppendice = JSON.parse(JSON.stringify(gnTreeAppendice));
-
-  rootAppendice = d3.hierarchy(gnTreeAppendice, function (node) {
-    return node.clade;
-  });
-
-  rootSpTree = rootAppendice.copy();
-
-  rootSpTree.each(function (node) {
-    clade = node.data;
-    if (clade.eventsRec[0].eventType === 'transferBack') {
-      delete clade['clade'];
-    }
-  });
-
-  return rootSpTree.data;
-}
-
 // Ajouter dans l'arbre des espèces
-function putAppendicesInSpTree (deadSpecies, rootSpTree) {
+function addDeadSpecies (rootSpTree, deadSpecies) {
   var appendix;
   var sourceSpecies;
   var node;
@@ -205,9 +124,9 @@ function findNodeByName (speciesLocation, hierarchySpTree) {
   return node;
 }
 
-// TODO: Ecrire giveSpeciesLocations
+// TODO: Ecrire giveSpeciesLocationForAllGn
 // Donner à chaque gène une speciesLocation
-function giveSpeciesLocations (rootsClades, deadSpecies) {
+function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
   var recTree;
   var outGns;
   var eventsRec;
@@ -220,13 +139,13 @@ function giveSpeciesLocations (rootsClades, deadSpecies) {
     eventsRec = outGn.data.eventsRec[0];
     switch (eventsRec.eventType) {
       case 'bifurcationOut':
-        console.log(outGn);
+        outGn.data.eventsRec[0].speciesLocation = outGn.data.sourceSpecies + '_out';
         break;
       case 'transferBack':
-
+        outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
         break;
       case 'loss':
-
+        outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
         break;
       default:
         recTreeVisu.error('Evenement non autorisé: ' + eventsRec.eventType);
@@ -250,4 +169,48 @@ function getAllOutGn (rootsRecGnTrees) {
   }
 
   return result;
+}
+
+function documentNbGeneAndEventInSpTree (rootsClades) {
+  var recTree;
+
+  recTree = recTreeVisu._computeHierarchy(rootsClades);
+  CreateGenesArrayInEachSp(recTree);
+  UpdateNbGeneAndEventInSpTree(recTree);
+}
+
+// Cette fonction associe les pointeurs d'espèces et de gènes entre eux
+function CreateGenesArrayInEachSp (recTree) {
+  var rootRecGnTree;
+  var gnNodes;
+  var gnNode;
+  var speciesLocation;
+  var species;
+  var speciesCl;
+  var gnClade;
+  var genes;
+
+  for (rootRecGnTree of recTree.rootsRecGnTrees) {
+    gnNodes = rootRecGnTree.descendants();
+    for (gnNode of gnNodes) {
+      speciesLocation = gnNode.data.eventsRec[0].speciesLocation;
+      species = findNodeByName(speciesLocation, recTree.rootSpTree);
+      speciesCl = species.data;
+      gnClade = gnNode.data;
+
+      if (!speciesCl.genes) {
+        speciesCl.genes = [];
+      }
+      genes = speciesCl.genes;
+      genes.push(gnClade);
+
+      gnClade.species = species;
+    }
+  }
+}
+
+// TODO UpdateNbGeneAndEventInSpTree
+// A partir du tableau de gènes de chaque espèces donner le nombre de ligne et de colonne necessaire pour le représenter.
+function UpdateNbGeneAndEventInSpTree (recTree) {
+
 }
