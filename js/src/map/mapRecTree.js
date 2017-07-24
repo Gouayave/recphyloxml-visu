@@ -18,7 +18,7 @@ recTreeVisu.map = function (rootsClades) {
 };
 
 function _spTreeLayout () {
-  // TODO: REFAIRE
+  // FIXME Calcul des coordonnées
   // Les coordonnées du container doivent etre calculer en fonction du nb d'evenement et du nb d'histoires de gênes.
   var defaultSize = { width: 300, height: 500 };
   var eventSize = 50;
@@ -40,14 +40,13 @@ function _spTreeLayout () {
     numberOfNodes = root.descendants().length;
     separationHeight = size.height / numberOfNodes;
     root.inOrderTraversal(function (d) {
-      // TODO: REFAIRE
+      // FIXME Position y de l'arbre des espèces
       // Refaire en fonction du nb d'histoire
       y += separationHeight;
       d.y = y;
       y += separationHeight;
 
-      // TODO: REFAIRE
-      // Placement différent si un des enfant est une espece morte
+      // FIXME Placement x différent si un des enfant est une espece morte
       if (d.data.sameAsParent) {
         var middleY = (d.y + d.parent.y) / 2;
         d.y = middleY;

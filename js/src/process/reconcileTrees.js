@@ -76,11 +76,14 @@ function mergeDeadSpecies (deadSpecies) {
     });
     keepSpecies.push(keepBiggerTree(rootsAppendice));
   }
+
   return keepSpecies;
 }
 
-// TODO: FAUX
-// Pour l'instant la fonction prend l'arbre le plus grand, ce n'est pas la bonne méthode il faudrai fusionner les arbres.
+// BUG Réecrire keepBiggerTree
+// Cette fonction a pour objectif de fusionner les appendices possibles formé grace aux différents arbres de gènes.
+// Pour l'instant la fonction prend l'arbre le plus grand, ce n'est pas la bonne solution.
+// La fonction doit fusionner les appendices.
 function keepBiggerTree (rootsAppendice) {
   var maxLength = 0;
   var result, lengthDescendants;
@@ -128,15 +131,14 @@ function createAppendiceSpTreeFromGnTreeOut (gnTreeAppendice) {
     rootSpTree,
     clade;
 
+  gnTreeAppendice = JSON.parse(JSON.stringify(gnTreeAppendice));
+
   rootAppendice = d3.hierarchy(gnTreeAppendice, function (node) {
     return node.clade;
   });
 
-  // TODO: FAUX
-  // L'élement data n'est pas une copy en profondeur!
   rootSpTree = rootAppendice.copy();
 
-  // TODO: FAUX
   rootSpTree.each(function (node) {
     clade = node.data;
     if (clade.eventsRec[0].eventType === 'transferBack') {
@@ -203,9 +205,49 @@ function findNodeByName (speciesLocation, hierarchySpTree) {
   return node;
 }
 
+// TODO: Ecrire giveSpeciesLocations
+// Donner à chaque gène une speciesLocation
 function giveSpeciesLocations (rootsClades, deadSpecies) {
   var recTree;
+  var outGns;
+  var eventsRec;
+  var outGn;
+
   recTree = recTreeVisu._computeHierarchy(rootsClades);
-  console.log(recTree);
-  console.log(deadSpecies);
+
+  outGns = getAllOutGn(recTree.rootsRecGnTrees);
+  for (outGn of outGns) {
+    eventsRec = outGn.data.eventsRec[0];
+    switch (eventsRec.eventType) {
+      case 'bifurcationOut':
+        console.log(outGn);
+        break;
+      case 'transferBack':
+
+        break;
+      case 'loss':
+
+        break;
+      default:
+        recTreeVisu.error('Evenement non autorisé: ' + eventsRec.eventType);
+    }
+  }
+}
+
+function getAllOutGn (rootsRecGnTrees) {
+  var outGn;
+  var allGn;
+  var result = [];
+  var rootRecGnTree;
+
+  for (rootRecGnTree of rootsRecGnTrees) {
+    allGn = rootRecGnTree.descendants();
+    outGn = allGn.filter(function (gn) {
+      var eventsRec = gn.data.eventsRec[0];
+      return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'out' || eventsRec.speciesLocation === 'undefined';
+    });
+    result = result.concat(outGn);
+  }
+
+  return result;
 }

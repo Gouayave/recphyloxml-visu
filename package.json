@@ -16,7 +16,8 @@
       "ActiveXObject",
       "_",
       "treeify",
-      "randomColor"
+      "randomColor",
+      "jQuery"
     ]
   }
 }

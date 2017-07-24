@@ -13,8 +13,13 @@ recTreeVisu.vizualize = function (recPhyloXML, domContainerId) {
   var recTrees;
   // Parse le recPhyloXML, créer les branches mortes et stock dans un objet de type recTree
   rootsClades = recTreeVisu.process(recPhyloXML);
+  // console.log(treeify.asTree(rootsClades, true));
   // Calcul la position des elements de recTree (noueds, branches) dans un repère en 2 dimensions
   recTrees = recTreeVisu.map(rootsClades);
-  // //Genere le svg dans le container domContainerId
+  // Genere le svg dans le container domContainerId
   recTreeVisu.render(recTrees, domContainerId);
+};
+
+recTreeVisu.error = function (msgStr) {
+  return {msg: msgStr};
 };
