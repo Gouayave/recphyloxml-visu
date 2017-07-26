@@ -126,15 +126,46 @@ function findNodeByName (speciesLocation, hierarchySpTree) {
 
 // TODO: Ecrire giveSpeciesLocationForAllGn
 // Donner à chaque gène une speciesLocation
+// La speciesLocation permet de donner le nombre de gènes par espèces
 function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
   var recTree;
   var outGns;
-  var eventsRec;
-  var outGn;
+  var outGnsBrothers;
+  var undGns;
 
   recTree = recTreeVisu._computeHierarchy(rootsClades);
 
-  outGns = getAllOutGn(recTree.rootsRecGnTrees);
+  outGns = getOutGns(recTree.rootsRecGnTrees);
+  outGnsBrothers = getOutGnsBrothers(outGns,recTree);
+  undGns = getUndGns(recTree.rootsRecGnTrees);
+
+  manageOutGns(outGns, recTree);
+  manageOutGnsBrothers(outGnsBrothers, recTree);
+  manageUndGns(undGns, recTree.rootSpTree);
+
+}
+
+function getOutGns (rootsRecGnTrees) {
+  var outGn;
+  var allGn;
+  var result = [];
+  var rootRecGnTree;
+
+  for (rootRecGnTree of rootsRecGnTrees) {
+    allGn = rootRecGnTree.descendants();
+    outGn = allGn.filter(function (gn) {
+      var eventsRec = gn.data.eventsRec[0];
+      return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'out';
+    });
+    result = result.concat(outGn);
+  }
+  return result;
+}
+
+function manageOutGns(outGns,recTree) {
+  var outGn;
+  var eventsRec;
+
   for (outGn of outGns) {
     eventsRec = outGn.data.eventsRec[0];
     switch (eventsRec.eventType) {
@@ -142,7 +173,7 @@ function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
         outGn.data.eventsRec[0].speciesLocation = outGn.data.sourceSpecies + '_out';
         break;
       case 'transferBack':
-        outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
+        manageTrBack(outGn);
         break;
       case 'loss':
         outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
@@ -153,7 +184,58 @@ function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
   }
 }
 
-function getAllOutGn (rootsRecGnTrees) {
+function manageTrBack (outGn) {
+    var parentCl = outGn.parent.data;
+    var parentEventType = parentCl.eventsRec[0].eventType;
+
+    switch (parentEventType) {
+      case 'bifurcationOut':
+        outGn.data.eventsRec[0].speciesLocation = parentCl.sourceSpecies + '_out';
+        break;
+      case 'speciationOut':
+      case 'speciationOutLoss':
+        outGn.data.eventsRec[0].speciesLocation =  outGn.data.sourceSpecies + '_out';
+        break;
+      default:
+        recTreeVisu.error('Evenement parent non autorisé: ' + parentEventType);
+    }
+
+    //outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation+ '_out';
+}
+
+function getOutGnsBrothers(outGns) {
+  var outGn,
+      parentEventType,
+      posChild,
+      posBrotherChild,
+      brother,
+      outGnsBrothers = [];
+
+  for (outGn of outGns) {
+    parentEventType = outGn.parent.data.eventsRec[0].eventType;
+    if(parentEventType === 'speciationOut' || parentEventType === 'speciationOutLoss'){
+      posChild = outGn.posChild;
+      posBrotherChild = posChild  === 1 ? 0 : 1;
+      brother = outGn.parent.data.clade[posBrotherChild];
+      outGnsBrothers.push(brother)
+    }
+  }
+  return outGnsBrothers;
+}
+
+// FIXME:Gerer de mettre les species Location des fils duplication dans le bon _0 de l'arbre
+//
+function manageOutGnsBrothers (outGnsBrothers, recTree) {
+  var outGnsBrother,
+      speciesLocation;
+
+  for (outGnsBrother of outGnsBrothers) {
+    outGnsBrother.eventsRec[0].speciesLocation = outGnsBrother.eventsRec[0].speciesLocation + '_0';
+  }
+
+}
+
+function getUndGns(rootsRecGnTrees) {
   var outGn;
   var allGn;
   var result = [];
@@ -163,13 +245,52 @@ function getAllOutGn (rootsRecGnTrees) {
     allGn = rootRecGnTree.descendants();
     outGn = allGn.filter(function (gn) {
       var eventsRec = gn.data.eventsRec[0];
-      return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'out' || eventsRec.speciesLocation === 'undefined';
+      return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'undefined';
     });
     result = result.concat(outGn);
   }
-
   return result;
 }
+
+function manageUndGns(undGns,rootSpTree) {
+  var undGn,
+      posChild,
+      posBrotherChild,
+      brotherSpLocation,
+      brotherSp,
+      posBrotherSp,
+      posSp,
+      spLocation;
+
+  for (undGn of undGns) {
+    posChild = undGn.posChild;
+    posBrotherChild = posChild  === 1 ? 0 : 1;
+    brotherSpLocation = undGn.parent.data.clade[posBrotherChild].eventsRec[0].speciesLocation;
+    brotherSp = findNodeByName(brotherSpLocation,rootSpTree);
+    posBrotherSp = brotherSp.posChild;
+    posSp = posBrotherSp  === 1 ? 0 : 1;
+    spLocation = brotherSp.parent.data.clade[posSp].name;
+    undGn.data.eventsRec[0].speciesLocation = spLocation;
+  }
+
+
+}
+
+// function manageLossGn (outGn,rootSpTree) {
+//   var currentSpeciesLocation = outGn.data.eventsRec[0].speciesLocation;
+//   switch (currentSpeciesLocation) {
+//     case 'out':
+//       outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
+//       break;
+//     case 'undefined':
+//       getSpeciesLocationForUndefined(outGn,rootSpTree);
+//       break;
+//     default:
+//       recTreeVisu.error('currentSpeciesLocation non autorisé: ' + currentSpeciesLocation);
+//   }
+// }
+
+
 
 function documentNbGeneAndEventInSpTree (rootsClades) {
   var recTree;
@@ -212,5 +333,42 @@ function CreateGenesArrayInEachSp (recTree) {
 // TODO UpdateNbGeneAndEventInSpTree
 // A partir du tableau de gènes de chaque espèces donner le nombre de ligne et de colonne necessaire pour le représenter.
 function UpdateNbGeneAndEventInSpTree (recTree) {
+  var rootRecGnTree,
+      gnNodes,
+      gnNode,
+      eventType,
+      currentSpecies;
 
+  for ( rootRecGnTree of recTree.rootsRecGnTrees) {
+    gnNodes = rootRecGnTree.descendants();
+    for ( gnNode of gnNodes) {
+      eventType = gnNode.data.eventsRec[0].eventType;
+      currentSpecies = gnNode.data.species.data;
+      switch (eventType) {
+        case 'speciation':
+        case 'speciationLoss':
+        case 'speciationOutLoss':
+        case 'speciationOut':
+        case 'leaf':
+        case 'loss':
+          addGnHistoryInSpecies(currentSpecies);
+          break;
+        default:
+      }
+    }
+  }
+  // TEST :)
+  // for (node of recTree.rootSpTree.descendants()) {
+  //   console.log(node.data.name)
+  //   console.log(node.data.nbGnStories)
+  //   console.log("---------")
+  // }
+}
+
+function addGnHistoryInSpecies(speciesCl) {
+  if(!speciesCl.nbGnStories) {
+    speciesCl.nbGnStories = 1;
+  }else {
+    speciesCl.nbGnStories++;
+  }
 }
