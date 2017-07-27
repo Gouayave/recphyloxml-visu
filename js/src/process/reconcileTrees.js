@@ -333,14 +333,18 @@ function UpdateNbGeneAndEventInSpTree (recTree) {
         case 'speciationOutLoss':
         case 'speciationOut':
         case 'leaf':
+          addGnHistoryInSpecies(currentSpecies);
+          break;
         case 'loss':
           addGnHistoryInSpecies(currentSpecies);
+          addGnEventInSpecies(currentSpecies);
           break;
         case 'bifurcationOut':
         case 'duplication':
           addGnEventInSpecies(currentSpecies);
           break;
         case 'transferBack':
+          addGnEventInSpecies(currentSpecies);
           addGnEventInSpeciesFromTrB(gnNode,recTree.rootSpTree);
           break;
         default:
@@ -349,15 +353,17 @@ function UpdateNbGeneAndEventInSpTree (recTree) {
     }
   }
   // TEST :)
-  // for (node of recTree.rootSpTree.descendants()) {
-  //   console.log(node.data.name)
-  //   console.log(node.data.nbGnStories)
-  //   console.log(node.data.nbGnEvents)
-  //   console.log("---------")
-  // }
+
+  for (node of recTree.rootSpTree.descendants()) {
+    console.log(node.data.name)
+    console.log(node.data.nbGnStories)
+    console.log(node.data.nbGnEvents)
+    console.log("---------")
+  }
 }
 
 function addGnHistoryInSpecies (speciesCl) {
+
   if(!speciesCl.nbGnStories) {
     speciesCl.nbGnStories = 1;
   }else {
@@ -365,6 +371,9 @@ function addGnHistoryInSpecies (speciesCl) {
   }
 }
 
+// FIXME Il a trop de nbEvent ajouter
+// Exemple lorsque deux branch parrallèle ajoute chacun leur evenement
+// Lorsque deux arbres différents ajoute des evènement
 function addGnEventInSpecies (speciesCl) {
   if(!speciesCl.nbGnEvents) {
     speciesCl.nbGnEvents = 1;

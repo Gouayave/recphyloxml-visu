@@ -112,11 +112,14 @@ recTreeVisu.parseRecPhyloXML = function (xml) {
 // On récupére les clades racines des arbres
 function _getRootsClades (objRecPhyloXML) {
   var rootsClades = {};
+  var i = 0;
 
   // Get clades Root
   rootsClades.rootSpTree = _.get(objRecPhyloXML, 'recPhylo.spTree.phylogeny.clade[0]');
   rootsClades.rootsRecGnTrees = _.map(_.get(objRecPhyloXML, 'recPhylo.recGeneTree'), (phylogeny) => {
-    return _.get(phylogeny, 'phylogeny.clade[0]');
+    var root = _.get(phylogeny, 'phylogeny.clade[0]');
+    root.idTree = ++i;
+    return root;
   });
 
   return rootsClades;
