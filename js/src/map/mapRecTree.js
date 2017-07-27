@@ -21,13 +21,13 @@ function _spTreeLayout () {
   // FIXME Calcul des coordonnées
   // Les coordonnées du container doivent etre calculer en fonction du nb d'evenement et du nb d'histoires de gênes.
   var defaultSize = { width: 300, height: 500 };
-  var eventSize = 50;
-  var historySize = 20;
+  var eventSize = 30;
+  var historySize = 15;
+
 
   function spTreeLayout (root) {
     var size = defaultSize;
     var maxDepth,
-      separationHeight,
       numberOfNodes;
     var y = 0;
     var leaves;
@@ -38,15 +38,21 @@ function _spTreeLayout () {
     };
 
     numberOfNodes = root.descendants().length;
-    separationHeight = size.height / numberOfNodes;
-    root.inOrderTraversal(function (d) {
-      // FIXME Position y de l'arbre des espèces
-      // Refaire en fonction du nb d'histoire
-      y += separationHeight;
-      d.y = y;
-      y += separationHeight;
 
-      // FIXME Placement x différent si un des enfant est une espece morte
+    // Placement en y
+    root.inOrderTraversal(function (d) {
+      var speciesHeight,
+          nbGnStories = d.data.nbGnStories || 1;
+
+
+      speciesHeight = historySize + nbGnStories * historySize;
+      d.speciesHeight = speciesHeight;
+
+      y += speciesHeight /2;
+      d.y = y;
+      y += speciesHeight /2;
+
+      // Placement différent pour un enfant out
       if (d.data.sameAsParent) {
         var middleY = (d.y + d.parent.y) / 2;
         d.y = middleY;
@@ -54,14 +60,17 @@ function _spTreeLayout () {
       }
     });
 
-    // maxDepth = _maxDepth(root);
-    // separationWidth = size.width / (maxDepth + 1);
+    // Placement en x
     root.x = 50;
     maxDepth = 0;
     root.each(function (d) {
-      // d.x = d.depth * separationWidth;
+      var nbGnEvents = d.data.nbGnEvents || 0;
+          speciesWidth = eventSize + nbGnEvents * eventSize;
+
+      d.speciesWidth = speciesWidth;
+
       if (d.parent) {
-        d.x = d.parent.x + eventSize + (historySize * 2);
+        d.x = d.parent.x + d.parent.speciesWidth + d.parent.speciesHeight;
       }
 
       if (d.x > maxDepth) {
@@ -71,18 +80,20 @@ function _spTreeLayout () {
 
     // Compute container position
     root.each(function (d) {
+      speciesHeight = d.speciesHeight;
+
       d.container = {
         start: { up: {}, down: {} },
         stop: { up: {}, down: {} }
       };
 
       d.container.start.up.x = d.x;
-      d.container.start.up.y = d.y - historySize;
+      d.container.start.up.y = d.y - (speciesHeight / 2);
 
       d.container.start.down.x = d.x;
-      d.container.start.down.y = d.y + historySize;
+      d.container.start.down.y = d.y + (speciesHeight / 2);
 
-      d.container.stop.up.x = d.x + eventSize;
+      d.container.stop.up.x = d.x + d.speciesWidth;
       d.container.stop.up.y = d.container.start.up.y;
 
       d.container.stop.down.x = d.container.stop.up.x;
@@ -91,8 +102,7 @@ function _spTreeLayout () {
 
     leaves = root.leaves();
     leaves.forEach(function (d) {
-      // d.container.x = (maxDepth + 1) * separationWidth;
-      d.container.x = maxDepth + eventSize + historySize;
+      d.container.x = maxDepth + eventSize;
       d.container.y = d.y;
     });
   }

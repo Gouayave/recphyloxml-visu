@@ -223,8 +223,7 @@ function getOutGnsBrothers(outGns) {
   return outGnsBrothers;
 }
 
-// FIXME:Gerer de mettre les species Location des fils duplication dans le bon _0 de l'arbre
-//
+
 function manageOutGnsBrothers (outGnsBrothers, recTree) {
   var outGnsBrother,
       speciesLocation;
@@ -275,22 +274,6 @@ function manageUndGns(undGns,rootSpTree) {
 
 
 }
-
-// function manageLossGn (outGn,rootSpTree) {
-//   var currentSpeciesLocation = outGn.data.eventsRec[0].speciesLocation;
-//   switch (currentSpeciesLocation) {
-//     case 'out':
-//       outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
-//       break;
-//     case 'undefined':
-//       getSpeciesLocationForUndefined(outGn,rootSpTree);
-//       break;
-//     default:
-//       recTreeVisu.error('currentSpeciesLocation non autorisé: ' + currentSpeciesLocation);
-//   }
-// }
-
-
 
 function documentNbGeneAndEventInSpTree (rootsClades) {
   var recTree;
@@ -353,7 +336,15 @@ function UpdateNbGeneAndEventInSpTree (recTree) {
         case 'loss':
           addGnHistoryInSpecies(currentSpecies);
           break;
+        case 'bifurcationOut':
+        case 'duplication':
+          addGnEventInSpecies(currentSpecies);
+          break;
+        case 'transferBack':
+          addGnEventInSpeciesFromTrB(gnNode,recTree.rootSpTree);
+          break;
         default:
+          recTreeVisu.error('Evenement parent non autorisé: ' + eventType)
       }
     }
   }
@@ -361,14 +352,32 @@ function UpdateNbGeneAndEventInSpTree (recTree) {
   // for (node of recTree.rootSpTree.descendants()) {
   //   console.log(node.data.name)
   //   console.log(node.data.nbGnStories)
+  //   console.log(node.data.nbGnEvents)
   //   console.log("---------")
   // }
 }
 
-function addGnHistoryInSpecies(speciesCl) {
+function addGnHistoryInSpecies (speciesCl) {
   if(!speciesCl.nbGnStories) {
     speciesCl.nbGnStories = 1;
   }else {
     speciesCl.nbGnStories++;
   }
+}
+
+function addGnEventInSpecies (speciesCl) {
+  if(!speciesCl.nbGnEvents) {
+    speciesCl.nbGnEvents = 1;
+  }else {
+    speciesCl.nbGnEvents++;
+  }
+}
+
+function addGnEventInSpeciesFromTrB (gnNode,spTree) {
+  var destinationSpecies,
+      speciesCl;
+
+  destinationSpecies = gnNode.data.eventsRec[0].destinationSpecies;
+  speciesCl = findNodeByName(destinationSpecies,spTree).data;
+  addGnEventInSpecies(speciesCl);
 }

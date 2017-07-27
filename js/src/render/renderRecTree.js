@@ -30,14 +30,14 @@ function _drawSpTree (rootSpTree, svg) {
       return 'translate(' + d.x + ',' + d.y + ')';
     });
 
-  nodes.append('text')
-       .text(function (d) {
-         var name = d.data.name;
-         if (d.data.sameAsParent) {
-           name = d.parent.data.name;
-         }
-         return name;
-       });
+  // nodes.append('text')
+  //      .text(function (d) {
+  //        var name = d.data.name;
+  //        if (d.data.sameAsParent) {
+  //          name = d.parent.data.name;
+  //        }
+  //        return name;
+  //      });
 
   var links = rootSpTree.links();
 
