@@ -42,10 +42,14 @@ function _spTreeLayout () {
     // Placement en y
     root.inOrderTraversal(function (d) {
       var speciesHeight,
-          nbGnStories = d.data.nbGnStories || 1;
+          nbCorridors = d.data.nbCorridors || 1;
+
+      console.log('c----------');
+      console.log(d.data.name);
+      console.log(d.data.nbCorridors);
 
 
-      speciesHeight = historySize + nbGnStories * historySize;
+      speciesHeight = historySize + nbCorridors * historySize;
       d.speciesHeight = speciesHeight;
 
       y += speciesHeight /2;
@@ -67,6 +71,9 @@ function _spTreeLayout () {
       var nbGnEvents = d.data.nbGnEvents || 0;
           speciesWidth = eventSize + nbGnEvents * eventSize;
 
+      console.log('e----------');
+      console.log(d.data.name);
+      console.log(d.data.nbGnEvents);
       d.speciesWidth = speciesWidth;
 
       if (d.parent) {
