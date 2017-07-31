@@ -21,7 +21,11 @@ recTreeVisu.reconcileTrees = function (rootsClades) {
 
   giveSpeciesLocationForAllGn(rootsClades, gnTreesAppendices);
 
+  // IDEA documentNbGeneAndEventInSpTree
+  // Il faudrait utiliser les corridors pour placer les evenements
   documentNbGeneAndEventInSpTree(rootsClades);
+
+  // getGnCorridors(rootsClades);
 
   return rootsClades;
 };
@@ -115,11 +119,6 @@ function findNodeByName (speciesLocation, hierarchySpTree) {
     throw msg;
   }
 
-  if (node.parent.data.clade[0] === node.data) {
-    node.position = 0;
-  } else if (node.parent.data.clade[1] === node.data) {
-    node.position = 1;
-  }
 
   return node;
 }
@@ -136,12 +135,14 @@ function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
   recTree = recTreeVisu._computeHierarchy(rootsClades);
 
   outGns = getOutGns(recTree.rootsRecGnTrees);
-  outGnsBrothers = getOutGnsBrothers(outGns,recTree);
-  undGns = getUndGns(recTree.rootsRecGnTrees);
-
   manageOutGns(outGns, recTree);
+
+  outGnsBrothers = getOutGnsBrothers(outGns,recTree);
   manageOutGnsBrothers(outGnsBrothers, recTree);
+
+  undGns = getUndGns(recTree.rootsRecGnTrees);
   manageUndGns(undGns, recTree.rootSpTree);
+
 
 }
 
@@ -280,6 +281,9 @@ function documentNbGeneAndEventInSpTree (rootsClades) {
 
   recTree = recTreeVisu._computeHierarchy(rootsClades);
   CreateGenesArrayInEachSp(recTree);
+  getGnCorridors(recTree);
+
+
   UpdateNbGeneAndEventInSpTree(recTree);
 }
 
@@ -299,6 +303,8 @@ function CreateGenesArrayInEachSp (recTree) {
     for (gnNode of gnNodes) {
       speciesLocation = gnNode.data.eventsRec[0].speciesLocation;
       species = findNodeByName(speciesLocation, recTree.rootSpTree);
+
+
       speciesCl = species.data;
       gnClade = gnNode.data;
 
@@ -308,12 +314,58 @@ function CreateGenesArrayInEachSp (recTree) {
       genes = speciesCl.genes;
       genes.push(gnClade);
 
-      gnClade.species = species;
+      gnClade.species = species.data;
     }
   }
 }
 
-// TODO UpdateNbGeneAndEventInSpTree
+// On donne à chaque gènes un numéro de corridor dans l'espèces
+function getGnCorridors (recTree) {
+  for (rootRecGnTree of recTree.rootsRecGnTrees) {
+    updateCorridors(rootRecGnTree);
+  }
+}
+
+function updateCorridors (node) {
+  var nodeEventType,
+      child,
+      childEventType,
+      children,
+      corridor;
+
+  if(!node.data.species.corridor){
+    node.data.species.corridor = 1;
+  }
+  // On associe le corridor a chaque espèce
+  nodeEventType = node.data.eventsRec[0].eventType;
+  node.data.corridor = node.data.species.corridor;
+  switch (nodeEventType) {
+    case 'loss':
+    case 'leaf':
+    case 'speciation':
+    case 'speciationOutLoss':
+    case 'speciationLoss':
+      node.data.species.corridor++;
+      break;
+    case 'bifurcationOut':
+    case 'duplication':
+    case 'transferBack':
+      break;
+    default:
+      recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
+  }
+
+  // On fait la récursion
+  children = node.children;
+  if(children){
+    for (child of children) {
+      eventType = child.data.eventsRec[0].eventType;
+      updateCorridors(child);
+    }
+  }
+}
+
+
 // A partir du tableau de gènes de chaque espèces donner le nombre de ligne et de colonne necessaire pour le représenter.
 function UpdateNbGeneAndEventInSpTree (recTree) {
   var rootRecGnTree,
@@ -326,7 +378,7 @@ function UpdateNbGeneAndEventInSpTree (recTree) {
     gnNodes = rootRecGnTree.descendants();
     for ( gnNode of gnNodes) {
       eventType = gnNode.data.eventsRec[0].eventType;
-      currentSpecies = gnNode.data.species.data;
+      currentSpecies = gnNode.data.species;
       switch (eventType) {
         case 'speciation':
         case 'speciationLoss':
@@ -354,12 +406,12 @@ function UpdateNbGeneAndEventInSpTree (recTree) {
   }
   // TEST :)
 
-  for (node of recTree.rootSpTree.descendants()) {
-    console.log(node.data.name)
-    console.log(node.data.nbGnStories)
-    console.log(node.data.nbGnEvents)
-    console.log("---------")
-  }
+  // for (node of recTree.rootSpTree.descendants()) {
+  //   console.log(node.data.name)
+  //   console.log(node.data.nbGnStories)
+  //   console.log(node.data.nbGnEvents)
+  //   console.log("---------")
+  // }
 }
 
 function addGnHistoryInSpecies (speciesCl) {
@@ -375,6 +427,7 @@ function addGnHistoryInSpecies (speciesCl) {
 // Exemple lorsque deux branch parrallèle ajoute chacun leur evenement
 // Lorsque deux arbres différents ajoute des evènement
 function addGnEventInSpecies (speciesCl) {
+
   if(!speciesCl.nbGnEvents) {
     speciesCl.nbGnEvents = 1;
   }else {

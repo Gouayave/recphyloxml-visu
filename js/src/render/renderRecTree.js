@@ -15,8 +15,8 @@ recTreeVisu.render = function (recTree, domContainerId) {
 
 function _drawSpTree (rootSpTree, svg) {
   svg
-  .attr('width', 1000)
-  .attr('height', 1000)
+  .attr('width', 2000)
+  .attr('height', 2000)
   .append('g')
   .attr('transform', function (d) {
     return 'translate(' + 100 + ',' + 0 + ')';
