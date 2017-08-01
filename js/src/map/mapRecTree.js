@@ -6,9 +6,10 @@
  * @Last modified time: 2017-07-05T16:17:56+02:00
  */
 
+// FIXME Ne pas mettre en variable globales
  var defaultSize = { width: 300, height: 500 };
  var eventSize = 30;
- var historySize = 15;
+ var historySize = 25;
 
 
 recTreeVisu.map = function (rootsClades) {

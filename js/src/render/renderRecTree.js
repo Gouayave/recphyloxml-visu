@@ -13,7 +13,7 @@ recTreeVisu.render = function (recTree, domContainerId) {
             .attr('height', 2000)
             .append('g')
             .attr('transform', function (d) {
-              return 'translate(' + 100 + ',' + 0 + ')';
+              return 'translate(' + 50 + ',' + 0 + ')';
             });
 
 
@@ -142,7 +142,7 @@ function _drawGenesTrees (rootsRecGnTrees, svg) {
 }
 
 function _drawGenesTree (rootRecGnTree, svg) {
-
+  var idTree = rootRecGnTree.data.idTree;
   // var nodes = svg.selectAll('.node')
   //   .data(rootRecGnTree.descendants())
   //   .enter()
@@ -167,11 +167,11 @@ function _drawGenesTree (rootRecGnTree, svg) {
 
   var links = rootRecGnTree.links();
 
-  svg.selectAll('.gnLinks')
+  svg.selectAll('.gnLinks'+idTree)
   .data(links)
   .enter()
   .append('path')
-  .attr('class', 'gnLinks')
+  .attr('class', 'gnLinks'+idTree)
   .style('fill', 'none')
   .style('stroke', 'black')
   .attr('d', computeGnLinks);
@@ -180,21 +180,22 @@ function _drawGenesTree (rootRecGnTree, svg) {
 
   var leaves = allLeaves.filter(l => l.data.eventsRec[0].eventType === 'leaf');
 
-  svg.selectAll('.gnLeaves')
+  svg.selectAll('.gnLeaves'+idTree)
   .data(leaves)
   .enter()
   .append('path')
-  .attr('class', 'gnLeaves')
+  .attr('class', 'gnLeaves'+idTree)
   .style('fill', 'none')
   .style('stroke', 'black')
   .attr('d', computeLeafGn);
 
   var losses = allLeaves.filter(l => l.data.eventsRec[0].eventType === 'loss');
 
-  svg.selectAll('.gnLosses')
+  svg.selectAll('.gnLosses'+idTree)
   .data(losses)
   .enter()
   .append('g')
+  .attr('class', 'gnLosses'+idTree)
   .attr('transform', function (l) {
       return 'translate(' + l.x + ',' + l.y + ')' + 'rotate(45)';
     })
