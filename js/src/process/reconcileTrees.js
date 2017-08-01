@@ -329,6 +329,15 @@ function updateCorridors (node,recTree) {
       children,
       corridor;
 
+    // On fait la récursion
+    children = node.children;
+    if(children){
+      for (child of children) {
+        eventType = child.data.eventsRec[0].eventType;
+        updateCorridors(child,recTree);
+      }
+    }
+
   if(!node.data.species.nbCorridors){
     node.data.species.nbCorridors = 0;
   }
@@ -340,26 +349,29 @@ function updateCorridors (node,recTree) {
   if(!node.data.species.currentNbGnEvents){
     node.data.species.currentNbGnEvents = 0;
   }
+
   // On associe le corridor a chaque espèce
   nodeEventType = node.data.eventsRec[0].eventType;
   node.data.corridor = node.data.species.nbCorridors;
+
   switch (nodeEventType) {
     case 'loss':
       node.data.species.currentNbGnEvents = 0;
       updateNbGnEvents(node.data.species);
+      ++node.data.species.nbCorridors;
+      break;
     case 'leaf':
     case 'loss':
     case 'speciation':
     case 'speciationLoss':
     case 'speciationOut':
     case 'speciationOutLoss':
+      node.data.species.currentNbGnEvents = 0;
       ++node.data.species.nbCorridors;
       break;
 
-
     case 'bifurcationOut':
     case 'duplication':
-      node.data.species.currentNbGnEvents = 0;
     case 'transferBack':
       updateNbGnEvents(node.data.species);
       break;
@@ -367,14 +379,7 @@ function updateCorridors (node,recTree) {
       recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
   }
 
-  // On fait la récursion
-  children = node.children;
-  if(children){
-    for (child of children) {
-      eventType = child.data.eventsRec[0].eventType;
-      updateCorridors(child,recTree);
-    }
-  }
+
 }
 
 function updateNbGnEvents(species) {
@@ -388,89 +393,3 @@ function updateNbGnEvents(species) {
     species.nbGnEvents = currentNbGnEvents;
   }
 }
-
-
-
-// A partir du tableau de gènes de chaque espèces donner le nombre de ligne et de colonne necessaire pour le représenter.
-// function UpdateNbGeneAndEventInSpTree (recTree) {
-//   var rootRecGnTree,
-//       gnNodes,
-//       gnNode,
-//       eventType,
-//       currentSpecies;
-//
-//   for ( rootRecGnTree of recTree.rootsRecGnTrees) {
-//     gnNodes = rootRecGnTree.descendants();
-//     for ( gnNode of gnNodes) {
-//       eventType = gnNode.data.eventsRec[0].eventType;
-//       currentSpecies = gnNode.data.species;
-//       switch (eventType) {
-//         case 'speciation':
-//         case 'speciationLoss':
-//         case 'speciationOutLoss':
-//         case 'speciationOut':
-//         case 'leaf':
-//           addGnHistoryInSpecies(currentSpecies);
-//           break;
-//         case 'loss':
-//           addGnHistoryInSpecies(currentSpecies);
-//           addGnEventInSpecies(currentSpecies);
-//           break;
-//         case 'bifurcationOut':
-//         case 'duplication':
-//           addGnEventInSpecies(currentSpecies);
-//           break;
-//         case 'transferBack':
-//           addGnEventInSpecies(currentSpecies);
-//           addGnEventInSpeciesFromTrB(gnNode,recTree.rootSpTree);
-//           break;
-//         default:
-//           recTreeVisu.error('Evenement parent non autorisé: ' + eventType)
-//       }
-//     }
-//   }
-//   // TEST :)
-//
-//   // for (node of recTree.rootSpTree.descendants()) {
-//   //   console.log(node.data.name)
-//   //   console.log(node.data.nbGnStories)
-//   //   console.log(node.data.nbGnEvents)
-//   //   console.log("---------")
-//   // }
-// }
-
-// function addGnHistoryInSpecies (speciesCl) {
-//
-//   if(!speciesCl.nbGnStories) {
-//     speciesCl.nbGnStories = 1;
-//   }else {
-//     speciesCl.nbGnStories++;
-//   }
-// }
-
-// FIXME Il a trop de nbEvent ajouter
-// Exemple lorsque deux branch parrallèle ajoute chacun leur evenement
-// Lorsque deux arbres différents ajoute des evènement
-// function addGnEventInSpecies (speciesCl) {
-//
-//   if(!speciesCl.nbGnEvents) {
-//     speciesCl.nbGnEvents = 1;
-//   }else {
-//     speciesCl.nbGnEvents++;
-//   }
-// }
-
-// function addGnEventInSpeciesFromTrB (gnNode,spTree) {
-//   var destinationSpecies,
-//       speciesCl;
-//
-//   destinationSpecies = gnNode.data.eventsRec[0].destinationSpecies;
-//   species = findNodeByName(destinationSpecies,spTree).data;
-//
-//   if(!species.nbGnEvents){
-//     species.nbGnEvents = 0;
-//   }
-//
-//   species.nbGnEvents++;
-//
-// }
