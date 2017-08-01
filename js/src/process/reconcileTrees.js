@@ -317,11 +317,11 @@ function getGnCorridors (rootsClades) {
 
   for (rootRecGnTree of recTree.rootsRecGnTrees) {
     updateCorridors(rootRecGnTree,recTree);
+    updateNbEvents(rootRecGnTree,recTree);
   }
 }
 
 
-// FIXME !!!! Ne marche pas pour le moment: BLOQUANT !
 function updateCorridors (node,recTree) {
   var nodeEventType,
       child,
@@ -333,7 +333,6 @@ function updateCorridors (node,recTree) {
     children = node.children;
     if(children){
       for (child of children) {
-        eventType = child.data.eventsRec[0].eventType;
         updateCorridors(child,recTree);
       }
     }
@@ -341,6 +340,37 @@ function updateCorridors (node,recTree) {
   if(!node.data.species.nbCorridors){
     node.data.species.nbCorridors = 0;
   }
+
+  // On associe le corridor et l'evenement à chaque espèce
+  nodeEventType = node.data.eventsRec[0].eventType;
+
+  switch (nodeEventType) {
+    case 'loss':
+    case 'leaf':
+    case 'speciation':
+    case 'speciationLoss':
+    case 'speciationOut':
+    case 'speciationOutLoss':
+      ++node.data.species.nbCorridors;
+      break;
+
+    case 'bifurcationOut':
+    case 'duplication':
+    case 'transferBack':
+      break;
+    default:
+      recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
+  }
+  node.data.idCorridor = node.data.species.nbCorridors;
+
+}
+
+// IDEA ya moyen de faire mieux :)
+function updateNbEvents (node,recTree) {
+  var nodeEventType,
+      child,
+      childEventType,
+      children;
 
   if(!node.data.species.nbGnEvents){
     node.data.species.nbGnEvents = 0;
@@ -350,35 +380,35 @@ function updateCorridors (node,recTree) {
     node.data.species.currentNbGnEvents = 0;
   }
 
-  // On associe le corridor a chaque espèce
+  // On associe le corridor et l'evenement à chaque espèce
   nodeEventType = node.data.eventsRec[0].eventType;
-  node.data.corridor = node.data.species.nbCorridors;
 
   switch (nodeEventType) {
     case 'loss':
-      node.data.species.currentNbGnEvents = 0;
-      updateNbGnEvents(node.data.species);
-      ++node.data.species.nbCorridors;
-      break;
     case 'leaf':
-    case 'loss':
     case 'speciation':
     case 'speciationLoss':
     case 'speciationOut':
     case 'speciationOutLoss':
-      node.data.species.currentNbGnEvents = 0;
-      ++node.data.species.nbCorridors;
+      node.data.idEvent= node.data.species.currentNbGnEvents;
       break;
 
     case 'bifurcationOut':
     case 'duplication':
     case 'transferBack':
+      node.data.idEvent= node.data.species.currentNbGnEvents;
       updateNbGnEvents(node.data.species);
       break;
     default:
       recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
   }
 
+  // On fait la récursion
+  children = node.children;
+  if(children){
+    updateNbEvents(children[0],recTree);
+    updateNbEvents(children[1],recTree);
+  }
 
 }
 
@@ -386,7 +416,7 @@ function updateNbGnEvents(species) {
   var currentNbGnEvents,
       nbGnEvents;
 
-  currentNbGnEvents = ++species.currentNbGnEvents;
+  currentNbGnEvents = species.currentNbGnEvents++;
   nbGnEvents = species.nbGnEvents
 
   if( currentNbGnEvents > nbGnEvents){

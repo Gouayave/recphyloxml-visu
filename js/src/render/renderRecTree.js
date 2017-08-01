@@ -7,20 +7,22 @@
  */
 
 recTreeVisu.render = function (recTree, domContainerId) {
-  var svg = d3.select(domContainerId).append('svg');
+  var svg = d3.select(domContainerId)
+            .append('svg')
+            .attr('width', 2000)
+            .attr('height', 2000)
+            .append('g')
+            .attr('transform', function (d) {
+              return 'translate(' + 100 + ',' + 0 + ')';
+            });
+
+
 
   _drawSpTree(recTree.rootSpTree, svg);
   _drawGenesTrees(recTree.rootsRecGnTrees, svg);
 };
 
 function _drawSpTree (rootSpTree, svg) {
-  svg
-  .attr('width', 2000)
-  .attr('height', 2000)
-  .append('g')
-  .attr('transform', function (d) {
-    return 'translate(' + 100 + ',' + 0 + ')';
-  });
 
   var nodes = svg.selectAll('.node')
     .data(rootSpTree.descendants())
@@ -82,7 +84,36 @@ function _drawSpTree (rootSpTree, svg) {
   .attr('d', _leavesContainer);
 }
 
-function _drawGenesTrees (rootsRecGnTrees, drawZoneElement) {
+function _drawGenesTrees (rootsRecGnTrees, svg) {
+  rootsRecGnTrees.forEach(rootRecGnTree => _drawGenesTree(rootRecGnTree, svg) );
+}
+
+function _drawGenesTree (rootRecGnTree, svg) {
+
+  // var nodes = svg.selectAll('.node')
+  //   .data(rootRecGnTree.descendants())
+  //   .enter()
+  //   .append('g')
+  //   .attr('transform', function (d) {
+  //     return 'translate(' + d.x + ',' + d.y + ')';
+  //   });
+  //
+  //   nodes.append('text')
+  //        .text(function (d) {
+  //          var name = d.data.name;
+  //          return name;
+  //        });
+
+ var nodes = svg.selectAll('.node')
+   .data(rootRecGnTree.descendants())
+   .enter()
+    .append('circle')
+    .attr('cx', d => d.x)
+    .attr('cy', d => d.y)
+    .attr('r', 3);
+
+
+
 
 }
 

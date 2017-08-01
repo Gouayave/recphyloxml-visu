@@ -6,6 +6,11 @@
  * @Last modified time: 2017-07-05T16:17:56+02:00
  */
 
+ var defaultSize = { width: 300, height: 500 };
+ var eventSize = 30;
+ var historySize = 15;
+
+
 recTreeVisu.map = function (rootsClades) {
   var spTreeLayout = _spTreeLayout();
   var recGnTreesLayout = _recGnTreesLayout();
@@ -17,12 +22,10 @@ recTreeVisu.map = function (rootsClades) {
   return recTree;
 };
 
+
 function _spTreeLayout () {
   // FIXME Calcul des coordonnées
   // Les coordonnées du container doivent etre calculer en fonction du nb d'evenement et du nb d'histoires de gênes.
-  var defaultSize = { width: 300, height: 500 };
-  var eventSize = 30;
-  var historySize = 15;
 
 
   function spTreeLayout (root) {
@@ -43,11 +46,6 @@ function _spTreeLayout () {
     root.inOrderTraversal(function (d) {
       var speciesHeight,
           nbCorridors = d.data.nbCorridors || 1;
-
-      console.log('c----------');
-      console.log(d.data.name);
-      console.log(d.data.nbCorridors);
-
 
       speciesHeight = historySize + nbCorridors * historySize;
       d.speciesHeight = speciesHeight;
@@ -71,9 +69,6 @@ function _spTreeLayout () {
       var nbGnEvents = d.data.nbGnEvents || 0;
           speciesWidth = eventSize + nbGnEvents * eventSize;
 
-      console.log('e----------');
-      console.log(d.data.name);
-      console.log(d.data.nbGnEvents);
       d.speciesWidth = speciesWidth;
 
       if (d.parent) {
@@ -105,6 +100,10 @@ function _spTreeLayout () {
 
       d.container.stop.down.x = d.container.stop.up.x;
       d.container.stop.down.y = d.container.start.down.y;
+
+      // Pemet de donner un point de départ au arbres de gènes fils
+      d.data.speciesTopX = d.container.start.up.x;
+      d.data.speciesTopY = d.container.start.up.y;
     });
 
     leaves = root.leaves();
@@ -118,8 +117,27 @@ function _spTreeLayout () {
 
 function _recGnTreesLayout () {
   function recGnTreesLayout (roots) {
-
+    return roots.map(root => recGnTreeLayout(root));
   }
+  function recGnTreeLayout(root) {
+    var nodes;
+    nodes = root.descendants();
+    nodes.forEach(function (node) {
+      // On place les x
+      var speciesTopX = node.data.species.speciesTopX;
+      var idEvent = node.data.idEvent;
+      node.x = speciesTopX + (idEvent * eventSize);
+
+      // On place le y
+      var speciesTopY = node.data.species.speciesTopY;
+      var idCorridor = node.data.idCorridor;
+      node.y = speciesTopY + (idCorridor * historySize );
+
+    });
+
+    return root;
+  }
+
   return recGnTreesLayout;
 }
 
