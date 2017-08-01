@@ -104,6 +104,7 @@ function _spTreeLayout () {
       // Pemet de donner un point de départ au arbres de gènes fils
       d.data.speciesTopX = d.container.start.up.x;
       d.data.speciesTopY = d.container.start.up.y;
+
     });
 
     leaves = root.leaves();
