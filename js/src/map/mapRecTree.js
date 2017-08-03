@@ -57,9 +57,9 @@ function _spTreeLayout () {
 
       // Placement différent pour un enfant out
       if (d.data.sameAsParent) {
-        var middleY = (d.y + d.parent.y) / 2;
-        d.y = middleY;
-        d.parent.y = middleY;
+        // var middleY = (d.y + d.parent.y) / 2;
+        // d.y = middleY;
+        d.parent.y = d.y;
       }
     });
 
@@ -102,9 +102,13 @@ function _spTreeLayout () {
       d.container.stop.down.x = d.container.stop.up.x;
       d.container.stop.down.y = d.container.start.down.y;
 
+      // FIXME Beaucoup de repetition
       // Pemet de donner un point de départ au arbres de gènes fils
-      d.data.speciesTopX = d.container.start.up.x;
-      d.data.speciesTopY = d.container.start.up.y;
+      d.data.speciesTopStartX = d.container.start.up.x;
+      d.data.speciesTopStartY = d.container.start.up.y;
+      d.data.speciesTopStopX = d.container.stop.up.x;
+      d.data.speciesBottomY = d.container.start.down.y;
+
 
     });
 
@@ -126,15 +130,21 @@ function _recGnTreesLayout () {
     nodes = root.descendants();
     nodes.forEach(function (node) {
       // On place les x
-      var speciesTopX = node.data.species.speciesTopX;
+      var speciesTopStartX = node.data.species.speciesTopStartX;
       var idEvent = node.data.idEvent;
-      node.x = speciesTopX + (idEvent * eventSize);
+      node.x = speciesTopStartX + (idEvent * eventSize);
 
       // On place le y
-      var speciesTopY = node.data.species.speciesTopY;
+      var speciesTopStartY = node.data.species.speciesTopStartY;
+      var speciesBottomY = node.data.species.speciesBottomY;
       var idCorridor = node.data.idCorridor;
-      node.y = speciesTopY + (idCorridor * historySize );
+      var posChildSpecies = node.data.species.posChild;
 
+      if(posChildSpecies === 1){
+        node.y = speciesTopStartY + (idCorridor * historySize );
+      }else {
+        node.y = speciesBottomY - (idCorridor * historySize );
+      }
     });
 
     return root;

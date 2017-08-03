@@ -170,6 +170,10 @@ function _formatWithoutListEvents (objRecPhyloXML) {
         if (ev.attr && ev.attr.destinationSpecies) {
           ev.destinationSpecies = ev.attr.destinationSpecies;
         }
+
+        if (ev.attr && ev.attr.geneName) {
+          ev.geneName = ev.attr.geneName;
+        }
         delete ev['attr'];
       }
 
@@ -185,6 +189,7 @@ function _formatWithoutListEvents (objRecPhyloXML) {
 // Compute hierarchy data
 recTreeVisu._computeHierarchy = function (rootsClades) {
   var rootsHierarchy = {};
+  var idTree = 0;
 
   // Compute D3 hierarchical layout
   function returnClade (d) {
@@ -195,23 +200,25 @@ recTreeVisu._computeHierarchy = function (rootsClades) {
   // Add position child from his parent for futur use
   rootsHierarchy.rootSpTree.each(function (d) {
     if (d.children && d.children[0]) {
-      d.children[0].posChild = 0;
+      d.children[0].data.posChild = 0;
     }
 
     if (d.children && d.children[1]) {
-      d.children[1].posChild = 1;
+      d.children[1].data.posChild = 1;
     }
   });
 
   rootsHierarchy.rootsRecGnTrees = _.map(rootsClades.rootsRecGnTrees, (root) => {
     var rootRecGnTrees = d3.hierarchy(root, returnClade);
+    idTree++;
     rootRecGnTrees.each(function (d) {
+      d.data.idTree = idTree;
       if (d.children && d.children[0]) {
-        d.children[0].posChild = 0;
+        d.children[0].data.posChild = 0;
       }
 
       if (d.children && d.children[1]) {
-        d.children[1].posChild = 1;
+        d.children[1].data.posChild = 1;
       }
     });
     return rootRecGnTrees;

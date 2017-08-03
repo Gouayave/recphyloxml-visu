@@ -67,6 +67,7 @@ function createDeadSpFromGnTrees (deadSpecies) {
     outSp = {};
     outSp.sourceSpecies = cs;
     outSp.name = cs + '_out';
+    outSp.out = true;
     keepSpecies.push(outSp);
   }
   return keepSpecies;
@@ -119,7 +120,6 @@ function findNodeByName (speciesLocation, hierarchySpTree) {
     throw msg;
   }
 
-
   return node;
 }
 
@@ -134,6 +134,7 @@ function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
 
   recTree = recTreeVisu._computeHierarchy(rootsClades);
 
+
   outGns = getOutGns(recTree.rootsRecGnTrees);
   manageOutGns(outGns, recTree);
 
@@ -142,6 +143,8 @@ function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
 
   undGns = getUndGns(recTree.rootsRecGnTrees);
   manageUndGns(undGns, recTree.rootSpTree);
+
+
 
 
 }
@@ -188,6 +191,7 @@ function manageOutGns(outGns,recTree) {
 function manageTrBack (outGn) {
     var parentCl = outGn.parent.data;
     var parentEventType = parentCl.eventsRec[0].eventType;
+    var sourceSpecies;
 
     switch (parentEventType) {
       case 'bifurcationOut':
@@ -195,7 +199,9 @@ function manageTrBack (outGn) {
         break;
       case 'speciationOut':
       case 'speciationOutLoss':
-        outGn.data.eventsRec[0].speciesLocation =  outGn.data.sourceSpecies + '_out';
+        console.log(parentEventType);
+        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation
+        outGn.data.eventsRec[0].speciesLocation =  sourceSpecies + '_out';
         break;
       default:
         recTreeVisu.error('Evenement parent non autorisé: ' + parentEventType);
@@ -215,7 +221,7 @@ function getOutGnsBrothers(outGns) {
   for (outGn of outGns) {
     parentEventType = outGn.parent.data.eventsRec[0].eventType;
     if(parentEventType === 'speciationOut' || parentEventType === 'speciationOutLoss'){
-      posChild = outGn.posChild;
+      posChild = outGn.data.posChild;
       posBrotherChild = posChild  === 1 ? 0 : 1;
       brother = outGn.parent.data.clade[posBrotherChild];
       outGnsBrothers.push(brother)
@@ -263,11 +269,11 @@ function manageUndGns(undGns,rootSpTree) {
       spLocation;
 
   for (undGn of undGns) {
-    posChild = undGn.posChild;
+    posChild = undGn.data.posChild;
     posBrotherChild = posChild  === 1 ? 0 : 1;
     brotherSpLocation = undGn.parent.data.clade[posBrotherChild].eventsRec[0].speciesLocation;
     brotherSp = findNodeByName(brotherSpLocation,rootSpTree);
-    posBrotherSp = brotherSp.posChild;
+    posBrotherSp = brotherSp.data.posChild;
     posSp = posBrotherSp  === 1 ? 0 : 1;
     spLocation = brotherSp.parent.data.clade[posSp].name;
     undGn.data.eventsRec[0].speciesLocation = spLocation;

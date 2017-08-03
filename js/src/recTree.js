@@ -16,6 +16,10 @@ recTreeVisu.vizualize = function (recPhyloXML, domContainerId) {
   // console.log(treeify.asTree(rootsClades, true));
   // Calcul la position des elements de recTree (noueds, branches) dans un repère en 2 dimensions
   recTrees = recTreeVisu.map(rootsClades);
+
+ //  console.log(
+ //   treeify.asTree(rootsClades, true)
+ // );
   // Genere le svg dans le container domContainerId
   recTreeVisu.render(recTrees, domContainerId);
 };

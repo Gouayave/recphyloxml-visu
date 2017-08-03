@@ -31,6 +31,7 @@ function flatTree (treeRoot, config = defaultConfig) {
   });
 
   treeRootNode.each(function (node) {
+
     if (node.children && node.children.length) {
       node.children.forEach(function (child, posChild) {
         var eventsRec = child.data.eventsRec;
@@ -42,6 +43,7 @@ function flatTree (treeRoot, config = defaultConfig) {
         if (eventsRec) {
           do {
             newEvent = eventsRec.shift();
+
             if (newEvent) {
               switch (newEvent && newEvent.eventType) {
                 case 'speciationLoss':
@@ -61,6 +63,7 @@ function flatTree (treeRoot, config = defaultConfig) {
                     currentNode.clade.push(newChild);
                     currentNode = newChild;
                   }
+
 
                   break;
 
