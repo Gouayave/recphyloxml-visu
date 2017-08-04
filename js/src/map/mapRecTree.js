@@ -57,9 +57,12 @@ function _spTreeLayout () {
 
       // Placement différent pour un enfant out
       if (d.data.sameAsParent) {
-        // var middleY = (d.y + d.parent.y) / 2;
-        // d.y = middleY;
         d.parent.y = d.y;
+        // FIXME ce n'est pas la bonne façon de faire ...
+        // Il vaut mieux prévenir le nouveaux fils d'un corridors
+        if(d.parent.speciesHeight > d.speciesHeight){
+          d.speciesHeight = d.parent.speciesHeight;
+        }
       }
     });
 
@@ -112,10 +115,18 @@ function _spTreeLayout () {
 
     });
 
-    leaves = root.leaves();
+    leaves = root.leaves()
     leaves.forEach(function (d) {
-      d.container.x = maxDepth + eventSize;
+
+      if(!d.data.out){
+        d.container.x = maxDepth + (2 * eventSize);
+      }else {
+        d.container.x = d.data.speciesTopStopX + eventSize;
+      }
+
+
       d.container.y = d.y;
+      d.data.maxX = d.container.x;
     });
   }
   return spTreeLayout;

@@ -356,7 +356,7 @@ var exampleXML = `
       </clade>
     </clade>
   </phylogeny>
-</recGeneTree>
+  </recGeneTree>
   <recGeneTree>
     <phylogeny rooted="true">
       <id>0</id>

@@ -19,7 +19,9 @@ recTreeVisu.reconcileTrees = function (rootsClades) {
 
   addDeadSpecies(rootsClades.rootSpTree, deadSpecies);
 
-  giveSpeciesLocationForAllGn(rootsClades, gnTreesAppendices);
+  giveSpeciesLocationForallGenes(rootsClades, gnTreesAppendices);
+
+  addChilGnInNewSpecies(rootsClades,deadSpecies);
 
   // IDEA documentNbGeneAndEventInSpTree
   // Il faudrait utiliser les corridors pour placer les evenements
@@ -123,10 +125,67 @@ function findNodeByName (speciesLocation, hierarchySpTree) {
   return node;
 }
 
-// TODO: Ecrire giveSpeciesLocationForAllGn
+function addChilGnInNewSpecies (rootsClades, deadSpecies) {
+  var recTree,
+      concernSpecies;
+
+  concernSpecies = deadSpecies.map(function (ds) {
+    return ds.sourceSpecies;
+  });
+  concernSpecies = _.uniq(concernSpecies);
+
+  recTree = recTreeVisu._computeHierarchy(rootsClades);
+  recTree.rootsRecGnTrees.forEach(function (rootRecGnTree) {
+    allGenes = rootRecGnTree.descendants();
+    allGenes.forEach(function (gn) {
+      var speciesLocation = gn.data.eventsRec[0].speciesLocation;
+      var index = concernSpecies.indexOf(speciesLocation);
+
+      if(index !== -1){
+        if(isConcernedBySpecOut(gn)){
+          addChildForMatchedGn(gn);
+        }
+      }
+    });
+  });
+}
+
+function isConcernedBySpecOut (gn) {
+  var eventType = gn.data.eventsRec[0].eventType;
+  var isTheOutChild = !!gn.data.sourceSpecies;
+  return eventType !== "speciationOutLoss" && eventType !== 'speciationOut' && !isTheOutChild && !gn.data.spOut;
+}
+
+function addChildForMatchedGn(gn) {
+  var name = gn.data.name;
+  var speciesLocationParent = gn.data.eventsRec[0].speciesLocation;
+  var eventsRecParent = [{eventType:'speciationOut', speciesLocation: speciesLocationParent}];
+
+
+  var speciesLocationLoss = gn.data.eventsRec[0].speciesLocation + '_out';
+  var eventsRecLoss = [{eventType:'loss', speciesLocation: speciesLocationLoss}];
+  var lossGn = {
+    name : 'loss',
+    eventsRec : eventsRecLoss,
+  }
+
+  gn.data.eventsRec[0].speciesLocation = speciesLocationParent+'_0';
+
+  var clades = [gn.data,lossGn]
+  var newClade = {
+    name : name,
+    eventsRec : eventsRecParent,
+    clade : clades
+  }
+  gn.parent.data.clade[gn.data.posChild] = newClade;
+
+}
+
+
+// TODO: Ecrire giveSpeciesLocationForallGenes
 // Donner à chaque gène une speciesLocation
 // La speciesLocation permet de donner le nombre de gènes par espèces
-function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
+function giveSpeciesLocationForallGenes (rootsClades, deadSpecies) {
   var recTree;
   var outGns;
   var outGnsBrothers;
@@ -145,19 +204,17 @@ function giveSpeciesLocationForAllGn (rootsClades, deadSpecies) {
   manageUndGns(undGns, recTree.rootSpTree);
 
 
-
-
 }
 
 function getOutGns (rootsRecGnTrees) {
   var outGn;
-  var allGn;
+  var allGenes;
   var result = [];
   var rootRecGnTree;
 
   for (rootRecGnTree of rootsRecGnTrees) {
-    allGn = rootRecGnTree.descendants();
-    outGn = allGn.filter(function (gn) {
+    allGenes = rootRecGnTree.descendants();
+    outGn = allGenes.filter(function (gn) {
       var eventsRec = gn.data.eventsRec[0];
       return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'out';
     });
@@ -199,7 +256,6 @@ function manageTrBack (outGn) {
         break;
       case 'speciationOut':
       case 'speciationOutLoss':
-        console.log(parentEventType);
         sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation
         outGn.data.eventsRec[0].speciesLocation =  sourceSpecies + '_out';
         break;
@@ -243,13 +299,13 @@ function manageOutGnsBrothers (outGnsBrothers, recTree) {
 
 function getUndGns(rootsRecGnTrees) {
   var outGn;
-  var allGn;
+  var allGenes;
   var result = [];
   var rootRecGnTree;
 
   for (rootRecGnTree of rootsRecGnTrees) {
-    allGn = rootRecGnTree.descendants();
-    outGn = allGn.filter(function (gn) {
+    allGenes = rootRecGnTree.descendants();
+    outGn = allGenes.filter(function (gn) {
       var eventsRec = gn.data.eventsRec[0];
       return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'undefined';
     });

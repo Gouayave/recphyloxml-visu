@@ -38,7 +38,7 @@ function flatTree (treeRoot, config = defaultConfig) {
         var newEvent = null;
         var startNode;
         var currentNode;
-        var newChild, newChildName, lossChildName;
+        var name, newChild, newChildName, lossChildName;
 
         if (eventsRec) {
           do {
@@ -47,8 +47,9 @@ function flatTree (treeRoot, config = defaultConfig) {
             if (newEvent) {
               switch (newEvent && newEvent.eventType) {
                 case 'speciationLoss':
-                  newChildName = child.data.name + '_SpL';
-                  lossChildName = child.data.name + '_Loss';
+                  name = child.data.eventsRec[0].geneName || child.data.name;
+                  newChildName = name + '_SpL';
+                  lossChildName = name + '_Loss';
 
                   if (config.speciationLoss === false) {
                     newChild = createNewSubTree(newChildName, newEvent);
@@ -68,8 +69,9 @@ function flatTree (treeRoot, config = defaultConfig) {
                   break;
 
                 case 'speciationOutLoss':
-                  newChildName = child.data.name + '_SpOL';
-                  lossChildName = child.data.name + '_Loss';
+                  name = child.data.eventsRec[0].geneName || child.data.name;
+                  newChildName = name + '_SpOL';
+                  lossChildName = name + '_Loss';
 
                   if (config.speciationOutLoss === false) {
                     newChild = createNewSubTree(newChildName, newEvent);
@@ -88,8 +90,9 @@ function flatTree (treeRoot, config = defaultConfig) {
                   break;
 
                 case 'transferBack':
-                  newChildName = child.data.name + '_TrB';
-                  lossChildName = child.data.name + '_Loss';
+                  name = child.data.eventsRec[0].geneName || child.data.name;
+                  newChildName = name + '_TrB';
+                  lossChildName = name + '_Loss';
 
                   if (config.transferBack === false) {
                     newChild = createNewSubTree(newChildName, newEvent);
