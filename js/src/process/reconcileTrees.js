@@ -125,6 +125,10 @@ function findNodeByName (speciesLocation, hierarchySpTree) {
   return node;
 }
 
+
+// FIXME
+// IL faut proablement refaire cette méthode
+// Elle permet d'ajouter des noueds dans les novelles espèces créer _0 et _out lors d'une spOut ou un spOutLoss
 function addChilGnInNewSpecies (rootsClades, deadSpecies) {
   var recTree,
       concernSpecies;
@@ -153,10 +157,15 @@ function addChilGnInNewSpecies (rootsClades, deadSpecies) {
 function isConcernedBySpecOut (gn) {
   var eventType = gn.data.eventsRec[0].eventType;
   var isTheOutChild = !!gn.data.sourceSpecies;
-  return eventType !== "speciationOutLoss" && eventType !== 'speciationOut' && !isTheOutChild && !gn.data.spOut;
+  //return  (eventType === 'speciation' || eventType === 'leaf') ;
+  return eventType !== "speciationOutLoss" && eventType !== 'speciationOut' && eventType !== 'duplication' && !isTheOutChild && !gn.data.spOut;
 }
 
 function addChildForMatchedGn(gn) {
+
+  // console.log(gn);
+  // debugger;
+
   var name = gn.data.name;
   var speciesLocationParent = gn.data.eventsRec[0].speciesLocation;
   var eventsRecParent = [{eventType:'speciationOut', speciesLocation: speciesLocationParent}];
@@ -170,6 +179,7 @@ function addChildForMatchedGn(gn) {
   }
 
   gn.data.eventsRec[0].speciesLocation = speciesLocationParent+'_0';
+
 
   var clades = [gn.data,lossGn]
   var newClade = {

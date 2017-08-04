@@ -71,8 +71,8 @@ function _drawSpTree (rootSpTree, svg) {
   .append('path')
   .attr('class', 'rightLinks')
   .style('fill', 'none')
-  .style('stroke', 'black')
-  .style('stroke-dasharray', '5,5')
+  .style('stroke', 'green')
+  .style('stroke-width',4)
   .attr('d', _diagonalLinkRight);
 
   var leaves = rootSpTree.leaves();
@@ -144,8 +144,13 @@ function _drawGenesTrees (rootsRecGnTrees, svg) {
   rootsRecGnTrees.forEach(rootRecGnTree => _drawGenesTree(rootRecGnTree, svg) );
 }
 
+// function colores_google(n) {
+//   var colores_g = ["#109618", "#3366cc", "#dc3912", "#ff9900", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+//   return colores_g[n % colores_g.length];
+// }
+
 function colores_google(n) {
-  var colores_g = ["#109618", "#3366cc", "#dc3912", "#ff9900", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+  var colores_g = ["grey"];
   return colores_g[n % colores_g.length];
 }
 
