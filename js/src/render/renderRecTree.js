@@ -10,7 +10,7 @@ recTreeVisu.render = function (recTree, domContainerId) {
   var svg = d3.select(domContainerId)
             .append('svg')
             .attr('width', 20000)
-            .attr('height', 20000)
+            .attr('height', 30000)
             .append('g')
             .attr('transform', function (d) {
               return 'translate(' + 50 + ',' + 50 + ')';
@@ -85,15 +85,24 @@ function _drawSpTree (rootSpTree, svg) {
 
 function _diagonalLinkLeft (d) {
   var path = d3.path();
-  var elbowPositionX = d.source.container.stop.up.x;
+  var elbowPositionX;
   var elbowPositionY = d.source.container.stop.up.y;
+  var isSpOut = d.target.data.sourceSpecies;
+
+
+  if(!isSpOut){
+    elbowPositionX = d.source.container.stop.down.x;
+  }else {
+    elbowPositionX = d.target.container.start.up.x - d.target.speciesHeight;
+  }
+
 
   path.moveTo(d.source.container.start.up.x, elbowPositionY);
   path.lineTo(elbowPositionX, elbowPositionY);
   path.lineTo(elbowPositionX, d.target.container.start.up.y);
   path.lineTo(d.target.container.start.up.x, d.target.container.start.up.y);
 
-  if (!d.target.data.sourceSpecies) {
+  if (!isSpOut) {
     path.moveTo(d.target.x, d.source.y);
   } else {
     path.moveTo(d.target.x, d.source.container.start.up.y);
@@ -105,7 +114,7 @@ function _diagonalLinkLeft (d) {
 
 function _diagonalLinkRight (d) {
   var path = d3.path();
-  var elbowPositionX = d.source.container.stop.down.x;
+  var elbowPositionX = d.source.container.stop.down.x ;
   var elbowPositionY = d.source.container.stop.down.y;
 
   path.moveTo(d.source.container.start.down.x, elbowPositionY);
@@ -208,7 +217,10 @@ function _drawGenesTree (rootRecGnTree, svg) {
   .attr('stroke-width',2)
   .attr('d', computeLeafGn);
 
-  var losses = allLeaves.filter(l => l.data.eventsRec[0].eventType === 'loss');
+
+  var losses = allLeaves.filter(function (l) {
+    return l.data.eventsRec[0].eventType === 'loss' && !l.data.deadOutGn;
+  });
 
   svg.selectAll('.gnLosses'+idTree)
   .data(losses)
@@ -312,17 +324,21 @@ function computeSpOutLinks(l) {
   var path = d3.path();
   var source = l.source;
   var target = l.target;
-  var idCorridor = source.data.idCorridor;
+  var idCorridorSrc = source.data.idCorridor;
+  var idCorridorTrg = target.data.idCorridor;
   var speciesTopStartX = target.data.species.speciesTopStartX;
 
-  path.moveTo(source.x, source.y);
 
-  if(target.data.out){
-    path.lineTo(speciesTopStartX - (idCorridor * historySize), source.y);
-    path.lineTo(speciesTopStartX - (idCorridor * historySize), target.y);
-    path.lineTo(target.x , target.y);
-  }else {
-    path.lineTo(target.x , target.y);
+  if(!target.data.deadOutGn){
+    path.moveTo(source.x, source.y);
+
+    if(target.data.out){
+      path.lineTo(speciesTopStartX - (idCorridorTrg * historySize), source.y);
+      path.lineTo(speciesTopStartX - (idCorridorTrg * historySize), target.y);
+      path.lineTo(target.x , target.y);
+    }else {
+      path.lineTo(target.x , target.y);
+    }
   }
 
   return path;

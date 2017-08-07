@@ -206,6 +206,11 @@ recTreeVisu._computeHierarchy = function (rootsClades) {
     if (d.children && d.children[1]) {
       d.children[1].data.posChild = 1;
     }
+
+    if(d.parent){
+      d.data.posParent = d.parent.data.posChild;
+    }
+
   });
 
   rootsHierarchy.rootsRecGnTrees = _.map(rootsClades.rootsRecGnTrees, (root) => {

@@ -151,11 +151,16 @@ function _recGnTreesLayout () {
       var idCorridor = node.data.idCorridor;
       var posChildSpecies = node.data.species.posChild;
 
+
       if(posChildSpecies === 1){
         node.y = speciesTopStartY + (idCorridor * historySize );
+        if(node.data.species.sameAsParent && node.data.species.posParent === 0){
+          node.y = speciesBottomY - (idCorridor * historySize );
+        }
       }else {
         node.y = speciesBottomY - (idCorridor * historySize );
       }
+
     });
 
     return root;

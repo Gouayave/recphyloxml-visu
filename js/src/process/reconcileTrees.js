@@ -158,13 +158,10 @@ function isConcernedBySpecOut (gn) {
   var eventType = gn.data.eventsRec[0].eventType;
   var isTheOutChild = !!gn.data.sourceSpecies;
   //return  (eventType === 'speciation' || eventType === 'leaf') ;
-  return eventType !== "speciationOutLoss" && eventType !== 'speciationOut' && eventType !== 'duplication' && !isTheOutChild && !gn.data.spOut;
+  return eventType !== "speciationOutLoss" && eventType !== 'speciationOut' && eventType !== 'duplication' && !isTheOutChild;
 }
 
 function addChildForMatchedGn(gn) {
-
-  // console.log(gn);
-  // debugger;
 
   var name = gn.data.name;
   var speciesLocationParent = gn.data.eventsRec[0].speciesLocation;
@@ -176,11 +173,12 @@ function addChildForMatchedGn(gn) {
   var lossGn = {
     name : 'loss',
     eventsRec : eventsRecLoss,
+    deadOutGn : true,
     out : true
   }
 
   gn.data.eventsRec[0].speciesLocation = speciesLocationParent+'_0';
-
+  gn.data.eventsRec[0].sameSpAsParent = true;
 
   var clades = [gn.data,lossGn]
   var newClade = {
@@ -188,6 +186,7 @@ function addChildForMatchedGn(gn) {
     eventsRec : eventsRecParent,
     clade : clades
   }
+
   gn.parent.data.clade[gn.data.posChild] = newClade;
 
 }
@@ -214,7 +213,6 @@ function giveSpeciesLocationForallGenes (rootsClades, deadSpecies) {
   undGns = getUndGns(recTree.rootsRecGnTrees);
   manageUndGns(undGns, recTree.rootSpTree);
 
-
 }
 
 function getOutGns (rootsRecGnTrees) {
@@ -237,13 +235,15 @@ function getOutGns (rootsRecGnTrees) {
 function manageOutGns(outGns,recTree) {
   var outGn;
   var eventsRec;
+  var sourceSpecies;
 
   for (outGn of outGns) {
     eventsRec = outGn.data.eventsRec[0];
     switch (eventsRec.eventType) {
       case 'bifurcationOut':
         outGn.data.out = true;
-        outGn.data.eventsRec[0].speciesLocation = outGn.data.sourceSpecies + '_out';
+        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation;
+        outGn.data.eventsRec[0].sourceSpecies = sourceSpecies + '_out';
         break;
       case 'transferBack':
         outGn.data.out = true;
@@ -265,11 +265,12 @@ function manageTrBack (outGn) {
 
     switch (parentEventType) {
       case 'bifurcationOut':
-        outGn.data.eventsRec[0].speciesLocation = parentCl.sourceSpecies + '_out';
+        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].sourceSpecies;
+        outGn.data.eventsRec[0].speciesLocation = sourceSpecies;
         break;
       case 'speciationOut':
       case 'speciationOutLoss':
-        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation
+        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation;
         outGn.data.eventsRec[0].speciesLocation =  sourceSpecies + '_out';
         break;
       default:
@@ -366,7 +367,6 @@ function CreateGenesArrayInEachSp (recTree) {
       speciesLocation = gnNode.data.eventsRec[0].speciesLocation;
       species = findNodeByName(speciesLocation, recTree.rootSpTree);
 
-
       speciesCl = species.data;
       gnClade = gnNode.data;
 
@@ -396,7 +396,6 @@ function getGnCorridors (rootsClades) {
   }
 }
 
-
 function updateCorridors (node,recTree) {
   var nodeEventType,
       child,
@@ -404,13 +403,14 @@ function updateCorridors (node,recTree) {
       children,
       corridor;
 
-    // On fait la récursion
-    children = node.children;
-    if(children){
-      for (child of children) {
-        updateCorridors(child,recTree);
-      }
+  // On fait la récursion
+  children = node.children;
+
+  if(children){
+    for (child of children) {
+      updateCorridors(child,recTree);
     }
+  }
 
   if(!node.data.species.nbCorridors){
     node.data.species.nbCorridors = 0;
@@ -426,9 +426,10 @@ function updateCorridors (node,recTree) {
     case 'speciationLoss':
     case 'speciationOut':
     case 'speciationOutLoss':
-      ++node.data.species.nbCorridors;
+      if(!node.data.deadOutGn){
+        ++node.data.species.nbCorridors;
+      }
       break;
-
     case 'bifurcationOut':
     case 'duplication':
     case 'transferBack':
@@ -436,6 +437,7 @@ function updateCorridors (node,recTree) {
     default:
       recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
   }
+
   node.data.idCorridor = node.data.species.nbCorridors;
 
 }
