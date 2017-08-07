@@ -60,9 +60,7 @@ function _drawSpTree (rootSpTree, svg) {
   .append('path')
   .attr('class', 'leftLinks')
   .style('fill', 'none')
-  .style('stroke', 'black')
-  .style('stroke-dasharray', '5,5')
-
+  .style('stroke', 'grey')
   .attr('d', _diagonalLinkLeft);
 
   svg.selectAll('.rightLinks')
@@ -71,8 +69,7 @@ function _drawSpTree (rootSpTree, svg) {
   .append('path')
   .attr('class', 'rightLinks')
   .style('fill', 'none')
-  .style('stroke', 'green')
-  .style('stroke-width',4)
+  .style('stroke', 'grey')
   .attr('d', _diagonalLinkRight);
 
   var leaves = rootSpTree.leaves();
@@ -82,8 +79,7 @@ function _drawSpTree (rootSpTree, svg) {
   .append('path')
   .attr('class', 'leaves')
   .style('fill', 'none')
-  .style('stroke', 'black')
-  .style('stroke-dasharray', '10,5')
+  .style('stroke', 'grey')
   .attr('d', _leavesContainer);
 }
 
@@ -144,15 +140,11 @@ function _drawGenesTrees (rootsRecGnTrees, svg) {
   rootsRecGnTrees.forEach(rootRecGnTree => _drawGenesTree(rootRecGnTree, svg) );
 }
 
-// function colores_google(n) {
-//   var colores_g = ["#109618", "#3366cc", "#dc3912", "#ff9900", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-//   return colores_g[n % colores_g.length];
-// }
-
 function colores_google(n) {
-  var colores_g = ["grey"];
+  var colores_g = ["#109618", "#3366cc", "#dc3912", "#ff9900", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
   return colores_g[n % colores_g.length];
 }
+
 
 function _drawGenesTree (rootRecGnTree, svg) {
   var idTree = rootRecGnTree.data.idTree;
@@ -194,7 +186,12 @@ function _drawGenesTree (rootRecGnTree, svg) {
   .attr('class', 'gnLinks'+idTree)
   .style('fill', 'none')
   .style('stroke', colores_google(idTree))
-  .attr('stroke-width',2)
+  .style('stroke-width',2)
+  .style('stroke-dasharray', function (l) {
+    if(l.source.data.eventsRec[0].eventType === "transferBack" && l.target.data.eventsRec[0].eventType !== "loss"){
+      return "5,5";
+    }
+  })
   .attr('d', computeGnLinks);
 
   var allLeaves = rootRecGnTree.leaves();
@@ -239,14 +236,17 @@ function computeGnLinks (l) {
     case 'speciationLoss':
       linkPath = computeSpeciationLinks(l);
       break;
-    // case 'speciationOut':
-    // case 'speciationOutLoss':
+    case 'speciationOut':
+    case 'speciationOutLoss':
+      linkPath = computeSpOutLinks(l);
+      break;
     case 'duplication':
+    case 'bifurcationOut':
       linkPath = computeDuplicationGnLinks(l);
       break;
-    // case 'bifurcationOut':
+
     case 'transferBack':
-      // linkPath = computeTrBackLinks(l);
+      linkPath = computeTrBackLinks(l);
       break;
     default:
 
@@ -306,4 +306,24 @@ function computeLeafGn(n) {
 function computeLossGn(n) {
   var path = d3.symbol().size(128).type(d3.symbolCross);
   return path(n);
+}
+
+function computeSpOutLinks(l) {
+  var path = d3.path();
+  var source = l.source;
+  var target = l.target;
+  var idCorridor = source.data.idCorridor;
+  var speciesTopStartX = target.data.species.speciesTopStartX;
+
+  path.moveTo(source.x, source.y);
+
+  if(target.data.out){
+    path.lineTo(speciesTopStartX - (idCorridor * historySize), source.y);
+    path.lineTo(speciesTopStartX - (idCorridor * historySize), target.y);
+    path.lineTo(target.x , target.y);
+  }else {
+    path.lineTo(target.x , target.y);
+  }
+
+  return path;
 }

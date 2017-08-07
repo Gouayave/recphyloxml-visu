@@ -176,6 +176,7 @@ function addChildForMatchedGn(gn) {
   var lossGn = {
     name : 'loss',
     eventsRec : eventsRecLoss,
+    out : true
   }
 
   gn.data.eventsRec[0].speciesLocation = speciesLocationParent+'_0';
@@ -241,9 +242,11 @@ function manageOutGns(outGns,recTree) {
     eventsRec = outGn.data.eventsRec[0];
     switch (eventsRec.eventType) {
       case 'bifurcationOut':
+        outGn.data.out = true;
         outGn.data.eventsRec[0].speciesLocation = outGn.data.sourceSpecies + '_out';
         break;
       case 'transferBack':
+        outGn.data.out = true;
         manageTrBack(outGn);
         break;
       case 'loss':
@@ -272,7 +275,6 @@ function manageTrBack (outGn) {
       default:
         recTreeVisu.error('Evenement parent non autorisé: ' + parentEventType);
     }
-
     //outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation+ '_out';
 }
 
@@ -360,6 +362,7 @@ function CreateGenesArrayInEachSp (recTree) {
   for (rootRecGnTree of recTree.rootsRecGnTrees) {
     gnNodes = rootRecGnTree.descendants();
     for (gnNode of gnNodes) {
+
       speciesLocation = gnNode.data.eventsRec[0].speciesLocation;
       species = findNodeByName(speciesLocation, recTree.rootSpTree);
 
