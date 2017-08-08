@@ -170,12 +170,11 @@ function _drawGenesTree (rootRecGnTree, svg) {
   });
 
 
-
   svg.selectAll('.leaf'+idTree)
   .data(  rootRecGnTree.leaves().filter(function (l) {
       return l.data.eventsRec[0].eventType === 'leaf'
     }))
-    .enter()
+  .enter()
   .append('g')
   .attr('class', 'leaf'+idTree)
   .attr('transform', function (d) {
@@ -190,7 +189,9 @@ function _drawGenesTree (rootRecGnTree, svg) {
     return name + ' ('+location+')';
    });
 
- // var nodes = svg.selectAll('.node')
+ var allNodes = rootRecGnTree.descendants();
+
+ // var allNodes = svg.selectAll('.node')
  //   .data(rootRecGnTree.descendants())
  //   .enter()
  //    .append('circle')
@@ -245,6 +246,23 @@ function _drawGenesTree (rootRecGnTree, svg) {
   .style('stroke-width',2)
   .style('stroke', colores_google(idTree))
   .attr('d', computeLossGn);
+
+  var duplications = allNodes.filter(n => n.data.eventsRec[0].eventType === 'duplication');
+
+  svg.selectAll('.duplication'+idTree)
+  .data(duplications)
+  .enter()
+  .append('g')
+  .attr('transform', function (n) {
+      return 'translate(' + n.x + ',' + n.y + ')';
+    })
+  .append('path')
+  .attr('class', 'duplication'+idTree)
+  .attr('d', computeDupGn)
+  .style('fill', 'white')
+  .style('stroke-width',2)
+  .style('stroke', colores_google(idTree));
+
 }
 
 
@@ -327,6 +345,11 @@ function computeLeafGn(n) {
 
 function computeLossGn(n) {
   var path = d3.symbol().size(256).type(d3.symbolCross);
+  return path(n);
+}
+
+function computeDupGn(n) {
+  var path = d3.symbol().size(256).type(d3.symbolSquare);
   return path(n);
 }
 
