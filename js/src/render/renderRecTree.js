@@ -7,10 +7,11 @@
  */
 
 recTreeVisu.render = function (recTree, domContainerId) {
+
   var svg = d3.select(domContainerId)
             .append('svg')
-            .attr('width', 20000)
-            .attr('height', 30000)
+            .attr('width', recTree.rootSpTree.sizeX + 500)
+            .attr('height', recTree.rootSpTree.sizeY + 500)
             .append('g')
             .attr('transform', function (d) {
               return 'translate(' + 50 + ',' + 50 + ')';
@@ -21,6 +22,11 @@ recTreeVisu.render = function (recTree, domContainerId) {
 };
 
 function _drawSpTree (rootSpTree, svg) {
+
+  svg = svg.append('g')
+  .attr('class', 'spTree')
+  .style('fill', 'none')
+  .style('stroke', 'black')
 
   var nodes = svg.selectAll('.node')
     .data(rootSpTree.descendants())
@@ -59,8 +65,6 @@ function _drawSpTree (rootSpTree, svg) {
   .enter()
   .append('path')
   .attr('class', 'leftLinks')
-  .style('fill', 'none')
-  .style('stroke', 'grey')
   .attr('d', _diagonalLinkLeft);
 
   svg.selectAll('.rightLinks')
@@ -68,8 +72,6 @@ function _drawSpTree (rootSpTree, svg) {
   .enter()
   .append('path')
   .attr('class', 'rightLinks')
-  .style('fill', 'none')
-  .style('stroke', 'grey')
   .attr('d', _diagonalLinkRight);
 
   var leaves = rootSpTree.leaves();
@@ -78,8 +80,6 @@ function _drawSpTree (rootSpTree, svg) {
   .enter()
   .append('path')
   .attr('class', 'leaves')
-  .style('fill', 'none')
-  .style('stroke', 'grey')
   .attr('d', _leavesContainer);
 }
 
@@ -155,8 +155,20 @@ function colores_google(n) {
 }
 
 
+
 function _drawGenesTree (rootRecGnTree, svg) {
   var idTree = rootRecGnTree.data.idTree;
+  var bold = false;
+
+  svg = svg.append('g')
+  .attr('class', 'gnTree'+idTree)
+  .style('stroke-width',2)
+  .style('cursor','pointer')
+  .on("click", function(d, i) {
+    toggleStrokWidth(this, bold)
+    bold = !bold;
+  });
+
 
 
   svg.selectAll('.leaf'+idTree)
@@ -195,7 +207,6 @@ function _drawGenesTree (rootRecGnTree, svg) {
   .attr('class', 'gnLinks'+idTree)
   .style('fill', 'none')
   .style('stroke', colores_google(idTree))
-  .style('stroke-width',2)
   .style('stroke-dasharray', function (l) {
     if(l.source.data.eventsRec[0].eventType === "transferBack" && l.target.data.eventsRec[0].eventType !== "loss"){
       return "5,5";
@@ -214,7 +225,6 @@ function _drawGenesTree (rootRecGnTree, svg) {
   .attr('class', 'gnLeaves'+idTree)
   .style('fill', 'none')
   .style('stroke', colores_google(idTree))
-  .attr('stroke-width',2)
   .attr('d', computeLeafGn);
 
 
@@ -232,7 +242,7 @@ function _drawGenesTree (rootRecGnTree, svg) {
     })
   .append('path')
   .style('fill', 'white')
-  .attr('stroke-width',2)
+  .style('stroke-width',2)
   .style('stroke', colores_google(idTree))
   .attr('d', computeLossGn);
 }
@@ -316,7 +326,7 @@ function computeLeafGn(n) {
 }
 
 function computeLossGn(n) {
-  var path = d3.symbol().size(128).type(d3.symbolCross);
+  var path = d3.symbol().size(256).type(d3.symbolCross);
   return path(n);
 }
 
@@ -342,4 +352,13 @@ function computeSpOutLinks(l) {
   }
 
   return path;
+}
+
+
+function toggleStrokWidth(gnTreeSvg,bold) {
+  if(!bold){
+    d3.select(gnTreeSvg).style('stroke-width',7);
+  }else {
+    d3.select(gnTreeSvg).style('stroke-width',2);
+  }
 }

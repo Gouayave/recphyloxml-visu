@@ -128,6 +128,11 @@ function _spTreeLayout () {
       d.container.y = d.y;
       d.data.maxX = d.container.x;
     });
+
+    // Taille de l'arbre;
+    root.sizeX = maxDepth;
+    root.sizeY = y;
+
   }
   return spTreeLayout;
 }
