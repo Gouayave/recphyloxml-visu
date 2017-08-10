@@ -83,56 +83,8 @@
       reader.readAsText(file);
     }
 
-    // function displayContents(contents) {
-    //
-    //   try {
-    //
-    //     rpXML.parse(contents, function (err,recTree) {
-    //       var flatTreeConfig = {
-    //         transferBack : false
-    //       }
-    //         var cladeRootGt = recTree.recPhylo.recGeneTree[0].phylogeny.clade;
-    //         cladeRootGt = rpXML.flatTree(cladeRootGt,flatTreeConfig);
-    //
-    //         if(recTree.recPhylo.spTree)
-    //         {
-    //           var cladeRootSt = recTree.recPhylo.spTree.phylogeny.clade;
-    //           rpXML.reconcile(cladeRootGt,cladeRootSt);
-    //         }
-    //
-    //         var svg = d3.select(drawZone).append("svg");
-    //         rpXML.generateSVG(svg,cladeRootGt);
-    //
-    //
-    //         var a = divDownload.appendChild(document.createElement('a'));
-    //         a.setAttribute("href", 'data:image/svg;utf8,' + encodeURIComponent(drawZone.innerHTML));
-    //         a.setAttribute("download","");
-    //         a.innerHTML = "Download";
-    //
-    //         try{
-    //             // console.log(svg)
-    //         } catch (err) {
-    //             console.error(err);
-    //             process.exit();
-    //         }
-    //
-    //       });
-    //
-    //   } catch (e) {
-    //     console.error(e)
-    //     var p = divDownload.appendChild(document.createElement('p'));
-    //     p.innerHTML = "Erreur lors de la création de l'arbre. Essayez avec un autre fichier.";
-    //   } finally {
-    //
-    //   }
-    //
-    // }
-
     document.getElementById('myFile')
       .addEventListener('change', readSingleFile, true);
-
-
-
 
   </script>
 </html>
