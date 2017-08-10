@@ -1,7 +1,7 @@
 {
-  "name": "visu_recphyloxml_client",
+  "name": "recphyloxml-visu-reconciliation",
   "version": "1.0.0",
-  "description": "",
+  "description": "recphyloXML visualisation genes trees in species tree.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,5 +19,8 @@
       "randomColor",
       "jQuery"
     ]
-  }
+  },
+  "keywords": [
+    "recphyloXML"
+  ]
 }
