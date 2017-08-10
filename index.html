@@ -6,14 +6,24 @@
   </head>
   <body>
 
+    <input type="file" id="myFile">
+    <div class="" id="download">
+
+    </div>
+
+    <!-- <li>rpXMLtoSVG.tar.gz (Javascript using node.js): <a href="softwares/rpXMLtoSVG.tar.gz" download>Download here</a></li> -->
+    <div class="" id="draw-zone">
+    </div>
+
+
     <!-- <textarea id="textAreaXML" rows="8" cols="40"></textarea>
     <input type="button" value="Visualize" onclick="visualize()"> -->
 
-    <div class="" id="download">
+    <!-- <div class="" id="download">
     </div>
 
     <div class="" id="draw-zone">
-    </div>
+    </div> -->
   </body>
   <script src="http://localhost:35729/livereload.js?snipver=1"></script>
 
@@ -42,11 +52,87 @@
 
   <script type="text/javascript">
 
+  var divDownload = document.getElementById("download");
+  var drawZone = document.getElementById("draw-zone");
 
-    var domContainer = document.getElementById("draw-zone");
-    // var textString = $('#textAreaXML').val();
-    var recPhyloXML = exampleXML;
-    recTreeVisu.vizualize(recPhyloXML,domContainer);
+
+  function readSingleFile(e) {
+
+      while (divDownload.firstChild) {
+          divDownload.removeChild(divDownload.firstChild);
+      }
+
+      while (drawZone.firstChild) {
+          drawZone.removeChild(drawZone.firstChild);
+      }
+
+      var file = e.target.files[0];
+      if (!file) {
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var contents = e.target.result;
+        recTreeVisu.vizualize(contents,drawZone);
+
+        var a = divDownload.appendChild(document.createElement('a'));
+        a.setAttribute("href", 'data:image/svg;utf8,' + encodeURIComponent(drawZone.innerHTML));
+        a.setAttribute("download","");
+        a.innerHTML = "Download";
+      };
+      reader.readAsText(file);
+    }
+
+    // function displayContents(contents) {
+    //
+    //   try {
+    //
+    //     rpXML.parse(contents, function (err,recTree) {
+    //       var flatTreeConfig = {
+    //         transferBack : false
+    //       }
+    //         var cladeRootGt = recTree.recPhylo.recGeneTree[0].phylogeny.clade;
+    //         cladeRootGt = rpXML.flatTree(cladeRootGt,flatTreeConfig);
+    //
+    //         if(recTree.recPhylo.spTree)
+    //         {
+    //           var cladeRootSt = recTree.recPhylo.spTree.phylogeny.clade;
+    //           rpXML.reconcile(cladeRootGt,cladeRootSt);
+    //         }
+    //
+    //         var svg = d3.select(drawZone).append("svg");
+    //         rpXML.generateSVG(svg,cladeRootGt);
+    //
+    //
+    //         var a = divDownload.appendChild(document.createElement('a'));
+    //         a.setAttribute("href", 'data:image/svg;utf8,' + encodeURIComponent(drawZone.innerHTML));
+    //         a.setAttribute("download","");
+    //         a.innerHTML = "Download";
+    //
+    //         try{
+    //             // console.log(svg)
+    //         } catch (err) {
+    //             console.error(err);
+    //             process.exit();
+    //         }
+    //
+    //       });
+    //
+    //   } catch (e) {
+    //     console.error(e)
+    //     var p = divDownload.appendChild(document.createElement('p'));
+    //     p.innerHTML = "Erreur lors de la création de l'arbre. Essayez avec un autre fichier.";
+    //   } finally {
+    //
+    //   }
+    //
+    // }
+
+    document.getElementById('myFile')
+      .addEventListener('change', readSingleFile, true);
+
+
+
 
   </script>
 </html>
