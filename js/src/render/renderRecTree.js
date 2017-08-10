@@ -33,7 +33,8 @@ function _drawSpTree (rootSpTree, svg) {
     .enter()
     .append('g')
     .attr('transform', function (d) {
-      return 'translate(' + d.x + ',' + (d.y - 40) + ')';
+      console.log(d);
+      return 'translate(' + d.data.speciesTopStartX + ',' + (d.data.speciesTopStartY - 5) + ')';
     });
 
   nodes.append('text')

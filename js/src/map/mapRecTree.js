@@ -68,23 +68,26 @@ function _spTreeLayout () {
 
     // Placement en x
     root.x = 50;
-    maxDepth = 0;
+
     root.each(function (d) {
       var nbGnEvents = d.data.nbGnEvents || 0;
           speciesWidth = eventSize + nbGnEvents * eventSize;
 
       d.speciesWidth = speciesWidth;
 
+      if(d.data.out){
+        d.parent.speciesWidth = d.parent.speciesWidth + d.speciesWidth;
+      }
+
       if (d.parent) {
         d.x = d.parent.x + d.parent.speciesWidth + d.parent.speciesHeight;
       }
 
-      if (d.x > maxDepth) {
-        maxDepth = d.x;
-      }
+
     });
 
     // Compute container position
+    var  maxDepth = 0;
     root.each(function (d) {
       speciesHeight = d.speciesHeight;
 
@@ -112,6 +115,10 @@ function _spTreeLayout () {
       d.data.speciesTopStopX = d.container.stop.up.x;
       d.data.speciesBottomY = d.container.start.down.y;
 
+
+      if (d.container.stop.up.x > maxDepth) {
+        maxDepth = d.container.stop.up.x;
+      }
 
     });
 
