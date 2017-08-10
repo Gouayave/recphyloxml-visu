@@ -142,6 +142,7 @@ function addChilGnInNewSpecies (rootsClades, deadSpecies) {
   recTree.rootsRecGnTrees.forEach(function (rootRecGnTree) {
     allGenes = rootRecGnTree.descendants();
     allGenes.forEach(function (gn) {
+
       var speciesLocation = gn.data.eventsRec[0].speciesLocation;
       var index = concernSpecies.indexOf(speciesLocation);
 
@@ -155,6 +156,7 @@ function addChilGnInNewSpecies (rootsClades, deadSpecies) {
 }
 
 function isConcernedBySpecOut (gn) {
+
   var eventType = gn.data.eventsRec[0].eventType;
   var isTheOutChild = !!gn.data.sourceSpecies;
   //return  (eventType === 'speciation' || eventType === 'leaf') ;
@@ -163,31 +165,36 @@ function isConcernedBySpecOut (gn) {
 
 function addChildForMatchedGn(gn) {
 
-  var name = gn.data.name;
-  var speciesLocationParent = gn.data.eventsRec[0].speciesLocation;
-  var eventsRecParent = [{eventType:'speciationOut', speciesLocation: speciesLocationParent}];
+
+  if(gn.parent){
+    var name = gn.data.name;
+    var speciesLocationParent = gn.data.eventsRec[0].speciesLocation;
+    var eventsRecParent = [{eventType:'speciationOut', speciesLocation: speciesLocationParent}];
 
 
-  var speciesLocationLoss = gn.data.eventsRec[0].speciesLocation + '_out';
-  var eventsRecLoss = [{eventType:'loss', speciesLocation: speciesLocationLoss}];
-  var lossGn = {
-    name : 'loss',
-    eventsRec : eventsRecLoss,
-    deadOutGn : true,
-    out : true
+    var speciesLocationLoss = gn.data.eventsRec[0].speciesLocation + '_out';
+    var eventsRecLoss = [{eventType:'loss', speciesLocation: speciesLocationLoss}];
+    var lossGn = {
+      name : 'loss',
+      eventsRec : eventsRecLoss,
+      deadOutGn : true,
+      out : true
+    }
+
+    gn.data.eventsRec[0].speciesLocation = speciesLocationParent+'_0';
+    gn.data.eventsRec[0].sameSpAsParent = true;
+
+    var clades = [gn.data,lossGn]
+    var newClade = {
+      name : name,
+      eventsRec : eventsRecParent,
+      clade : clades
+    }
+    gn.parent.data.clade[gn.data.posChild] = newClade;
   }
 
-  gn.data.eventsRec[0].speciesLocation = speciesLocationParent+'_0';
-  gn.data.eventsRec[0].sameSpAsParent = true;
 
-  var clades = [gn.data,lossGn]
-  var newClade = {
-    name : name,
-    eventsRec : eventsRecParent,
-    clade : clades
-  }
 
-  gn.parent.data.clade[gn.data.posChild] = newClade;
 
 }
 
@@ -206,12 +213,15 @@ function giveSpeciesLocationForallGenes (rootsClades, deadSpecies) {
 
   outGns = getOutGns(recTree.rootsRecGnTrees);
   manageOutGns(outGns, recTree);
+  console.log(outGns);
 
   outGnsBrothers = getOutGnsBrothers(outGns,recTree);
   manageOutGnsBrothers(outGnsBrothers, recTree);
+  console.log(outGnsBrothers);
 
   undGns = getUndGns(recTree.rootsRecGnTrees);
   manageUndGns(undGns, recTree.rootSpTree);
+  console.log(undGns);
 
 }
 
@@ -242,8 +252,13 @@ function manageOutGns(outGns,recTree) {
     switch (eventsRec.eventType) {
       case 'bifurcationOut':
         outGn.data.out = true;
-        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation;
-        outGn.data.eventsRec[0].sourceSpecies = sourceSpecies + '_out';
+        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation || outGn.parent.data.eventsRec[0].sourceSpecies;
+
+        if(!outGn.parent.data.eventsRec[0].sourceSpecies){
+          outGn.data.eventsRec[0].sourceSpecies = sourceSpecies + '_out';
+        }else {
+          outGn.data.eventsRec[0].sourceSpecies = sourceSpecies;
+        }
         break;
       case 'transferBack':
         outGn.data.out = true;
@@ -338,14 +353,18 @@ function manageUndGns(undGns,rootSpTree) {
       spLocation;
 
   for (undGn of undGns) {
-    posChild = undGn.data.posChild;
-    posBrotherChild = posChild  === 1 ? 0 : 1;
-    brotherSpLocation = undGn.parent.data.clade[posBrotherChild].eventsRec[0].speciesLocation;
-    brotherSp = findNodeByName(brotherSpLocation,rootSpTree);
-    posBrotherSp = brotherSp.data.posChild;
-    posSp = posBrotherSp  === 1 ? 0 : 1;
-    spLocation = brotherSp.parent.data.clade[posSp].name;
-    undGn.data.eventsRec[0].speciesLocation = spLocation;
+    if(undGn.data.eventsRec[0].sourceSpecies){
+      undGn.data.eventsRec[0].speciesLocation = undGn.data.eventsRec[0].sourceSpecies;
+    }else {
+      posChild = undGn.data.posChild;
+      posBrotherChild = posChild  === 1 ? 0 : 1;
+      brotherSpLocation = undGn.parent.data.clade[posBrotherChild].eventsRec[0].speciesLocation;
+      brotherSp = findNodeByName(brotherSpLocation,rootSpTree);
+      posBrotherSp = brotherSp.data.posChild;
+      posSp = posBrotherSp  === 1 ? 0 : 1;
+      spLocation = brotherSp.parent.data.clade[posSp].name;
+      undGn.data.eventsRec[0].speciesLocation = spLocation;
+    }
   }
 }
 

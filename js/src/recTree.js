@@ -22,6 +22,7 @@ recTreeVisu.vizualize = function (recPhyloXML, domContainerId) {
  // );
   // Genere le svg dans le container domContainerId
   recTreeVisu.render(recTrees, domContainerId);
+  console.log(recTrees);
 };
 
 recTreeVisu.error = function (msgStr) {

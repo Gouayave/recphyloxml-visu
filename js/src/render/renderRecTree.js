@@ -243,11 +243,10 @@ function _drawGenesTree (rootRecGnTree, svg) {
     })
   .append('path')
   .style('fill', 'white')
-  .style('stroke-width',2)
   .style('stroke', colores_google(idTree))
   .attr('d', computeLossGn);
 
-  var duplications = allNodes.filter(n => n.data.eventsRec[0].eventType === 'duplication');
+  var duplications = allNodes.filter(n => n.data.eventsRec[0].eventType === 'duplication' || n.data.eventsRec[0].eventType === 'bifurcationOut'  );
 
   svg.selectAll('.duplication'+idTree)
   .data(duplications)
@@ -260,7 +259,52 @@ function _drawGenesTree (rootRecGnTree, svg) {
   .attr('class', 'duplication'+idTree)
   .attr('d', computeDupGn)
   .style('fill', 'white')
-  .style('stroke-width',2)
+  .style('stroke', colores_google(idTree));
+
+  var transferBack = allNodes.filter(n => n.data.eventsRec[0].eventType === 'transferBack');
+
+  svg.selectAll('.transferBack'+idTree)
+  .data(transferBack)
+  .enter()
+  .append('g')
+  .attr('transform', function (n) {
+      return 'translate(' + n.x + ',' + n.y + ')';
+    })
+  .append('path')
+  .attr('class', 'transferBack'+idTree)
+  .attr('d', computeTrBackGn)
+  .style('fill', 'white')
+  .style('stroke', colores_google(idTree));
+
+  var transferBackTarget = allNodes.filter(function (n) {
+    return n.parent && n.parent.data.eventsRec[0].eventType === 'transferBack'&& n.data.eventsRec[0].eventType !== 'loss';
+  });
+
+  svg.selectAll('.transferBackTarget'+idTree)
+  .data(transferBackTarget)
+  .enter()
+  .append('g')
+  .attr('transform', function (n) {
+      return 'translate(' + n.x + ',' + n.y + ')' + 'rotate(90)';
+    })
+  .append('path')
+  .attr('class', 'transferBackTarget'+idTree)
+  .attr('d', computeTransferBackTarget)
+  .style('fill', 'white')
+  .style('stroke', colores_google(idTree));
+
+
+  svg.selectAll('.root'+idTree)
+  .data([rootRecGnTree])
+  .enter()
+  .append('g')
+  .attr('transform', function (n) {
+      return 'translate(' + n.x + ',' + n.y + ')' + 'rotate(90)';
+    })
+  .append('path')
+  .attr('class', 'root'+idTree)
+  .attr('d', computeRootGn)
+  .style('fill', 'white')
   .style('stroke', colores_google(idTree));
 
 }
@@ -326,12 +370,8 @@ function computeDuplicationGnLinks(l) {
 function computeTrBackLinks(l) {
   var source = l.source;
   var target = l.target;
-  var path = d3.path();
 
-  path.moveTo(source.x, source.y);
-  path.lineTo(target.x , target.y);
-
-  return path.toString();
+  return curvedVertical(source.x, source.y,target.x , target.y);
 }
 
 
@@ -352,6 +392,22 @@ function computeDupGn(n) {
   var path = d3.symbol().size(256).type(d3.symbolSquare);
   return path(n);
 }
+
+function computeTrBackGn(n) {
+  var path = d3.symbol().size(128).type(d3.symbolDiamond);
+  return path(n);
+}
+
+function computeRootGn(n) {
+  var path = d3.symbol().size(256).type(d3.symbolStar);
+  return path(n);
+}
+
+function computeTransferBackTarget(n) {
+  var path = d3.symbol().size(128).type(d3.symbolTriangle);
+  return path(n);
+}
+
 
 function computeSpOutLinks(l) {
   var path = d3.path();
@@ -377,11 +433,26 @@ function computeSpOutLinks(l) {
   return path;
 }
 
+// Source https://github.com/hughsk/svg-line-curved
+function curvedVertical(x1, y1, x2, y2) {
+  var line = []
+  var mx = x1 + (x2 - x1) / 2
+  var my = y1 + (y2 - y1) / 2
+
+  line.push('M', x1, y1)
+  line.push('C', x1, my, x2, my, x2, y2)
+
+  return line.join(' ')
+}
 
 function toggleStrokWidth(gnTreeSvg,bold) {
   if(!bold){
-    d3.select(gnTreeSvg).style('stroke-width',7);
+    d3.select(gnTreeSvg)
+    .style('stroke-width',5)
+    .style('font-weight','bold');
   }else {
-    d3.select(gnTreeSvg).style('stroke-width',2);
+    d3.select(gnTreeSvg)
+    .style('stroke-width',2)
+    .style('font-weight','normal');
   }
 }
