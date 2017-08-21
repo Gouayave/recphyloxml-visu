@@ -1,27 +1,28 @@
 {
-  "name": "recphyloxml-visu-reconciliation",
-  "version": "1.0.2",
-  "description": "recphyloXML visualisation genes trees in species tree.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "gouayave <guillaume.gence@gmail.com>",
-  "license": "ISC",
-  "standard": {
-    "globals": [
-      "d3",
-      "recTreeVisu",
-      "DOMParser",
-      "ActiveXObject",
-      "_",
-      "treeify",
-      "randomColor",
-      "jQuery"
-    ]
-  },
-  "keywords": [
-    "recphyloXML"
-  ],
-  "dependencies": {}
+    "name": "recphyloxml-visu-reconciliation",
+    "version": "1.0.2",
+    "description": "recphyloXML visualisation genes trees in species tree.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "cat js/src/recTree.js js/src/process/parseRecPhyloXML.js js/src/process/flatGenesTrees.js js/src/process/reconcileTrees.js js/src/process/processRecTree.js js/src/map/mapRecTree.js js/src/render/renderRecTree.js > js/build/recTreeVisu.js"
+    },
+    "author": "gouayave <guillaume.gence@gmail.com>",
+    "license": "ISC",
+    "standard": {
+        "globals": [
+            "d3",
+            "recTreeVisu",
+            "DOMParser",
+            "ActiveXObject",
+            "_",
+            "treeify",
+            "randomColor",
+            "jQuery"
+        ]
+    },
+    "keywords": [
+        "recphyloXML"
+    ],
+    "dependencies": {}
 }
