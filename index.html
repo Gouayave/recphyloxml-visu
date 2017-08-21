@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title></title>
-  </head>
-  <body>
+</head>
+
+<body>
 
     <input type="file" id="myFile">
     <div class="" id="download">
@@ -24,67 +26,66 @@
 
     <div class="" id="draw-zone">
     </div> -->
-  </body>
-  <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+</body>
+<script src="http://localhost:35729/livereload.js?snipver=1"></script>
 
 
-  <!-- DEPENDENCIES -->
-  <script src="js/lib/jquery-3.2.1.min.js" charset="utf-8"></script>
-  <script src="js/lib/d3.js" charset="utf-8"></script>
-  <script src="js/lib/lodash.js" charset="utf-8"></script>
-  <script src="js/lib/proclaim.js" charset="utf-8"></script>
-  <script src="js/lib/randomcolor.js" charset="utf-8"></script>
+<!-- DEPENDENCIES -->
+<script src="js/lib/jquery-3.2.1.min.js" charset="utf-8"></script>
+<script src="js/lib/d3.js" charset="utf-8"></script>
+<script src="js/lib/lodash.js" charset="utf-8"></script>
+<script src="js/lib/proclaim.js" charset="utf-8"></script>
+<script src="js/lib/randomcolor.js" charset="utf-8"></script>
 
-  <!-- Tests files -->
-  <script src="js/test/recPhyloXMLExample4.js" charset="utf-8"></script>
+<!-- Tests files -->
+<script src="js/test/recPhyloXMLExample4.js" charset="utf-8"></script>
 
-  <!-- lib for test -->
-  <script src="js/test/treeify.js" charset="utf-8"></script>
+<!-- lib for test -->
+<script src="js/test/treeify.js" charset="utf-8"></script>
 
-  <!-- SOURCE CODE -->
-  <script src="js/src/recTree.js" charset="utf-8"></script>
-  <script src="js/src/process/parseRecPhyloXML.js" charset="utf-8"></script>
-  <script src="js/src/process/flatGenesTrees.js" charset="utf-8"></script>
-  <script src="js/src/process/reconcileTrees.js" charset="utf-8"></script>
-  <script src="js/src/process/processRecTree.js" charset="utf-8"></script>
-  <script src="js/src/map/mapRecTree.js" charset="utf-8"></script>
-  <script src="js/src/render/renderRecTree.js" charset="utf-8"></script>
+<!-- SOURCE CODE -->
+<script src="js/src/recTree.js" charset="utf-8"></script>
+<script src="js/src/process/parseRecPhyloXML.js" charset="utf-8"></script>
+<script src="js/src/process/flatGenesTrees.js" charset="utf-8"></script>
+<script src="js/src/process/reconcileTrees.js" charset="utf-8"></script>
+<script src="js/src/process/processRecTree.js" charset="utf-8"></script>
+<script src="js/src/map/mapRecTree.js" charset="utf-8"></script>
+<script src="js/src/render/renderRecTree.js" charset="utf-8"></script>
 
-  <script type="text/javascript">
+<script type="text/javascript">
+    var divDownload = document.getElementById("download");
+    var drawZone = document.getElementById("draw-zone");
 
-  var divDownload = document.getElementById("download");
-  var drawZone = document.getElementById("draw-zone");
 
+    function readSingleFile(e) {
 
-  function readSingleFile(e) {
+        while (divDownload.firstChild) {
+            divDownload.removeChild(divDownload.firstChild);
+        }
 
-      while (divDownload.firstChild) {
-          divDownload.removeChild(divDownload.firstChild);
-      }
+        while (drawZone.firstChild) {
+            drawZone.removeChild(drawZone.firstChild);
+        }
 
-      while (drawZone.firstChild) {
-          drawZone.removeChild(drawZone.firstChild);
-      }
+        var file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var contents = e.target.result;
+            recTreeVisu.vizualize(contents, drawZone);
 
-      var file = e.target.files[0];
-      if (!file) {
-        return;
-      }
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        var contents = e.target.result;
-        recTreeVisu.vizualize(contents,drawZone);
-
-        var a = divDownload.appendChild(document.createElement('a'));
-        a.setAttribute("href", 'data:image/svg;utf8,' + encodeURIComponent(drawZone.innerHTML));
-        a.setAttribute("download","");
-        a.innerHTML = "Download";
-      };
-      reader.readAsText(file);
+            var a = divDownload.appendChild(document.createElement('a'));
+            a.setAttribute("href", 'data:image/svg;utf8,' + encodeURIComponent(drawZone.innerHTML));
+            a.setAttribute("download", "");
+            a.innerHTML = "Download";
+        };
+        reader.readAsText(file);
     }
 
     document.getElementById('myFile')
-      .addEventListener('change', readSingleFile, true);
+        .addEventListener('change', readSingleFile, true);
+</script>
 
-  </script>
 </html>
