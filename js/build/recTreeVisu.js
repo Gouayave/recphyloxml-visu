@@ -36,232 +36,236 @@ recTreeVisu.error = function (msgStr) {
  * @Last modif ied time: 2017-07-12T14:27:09+02:00
  */
 
- // Source : https://stackoverflow.com/questions/4200913/xml-to-javascript-object#19448718
-recTreeVisu.parseRecPhyloXML = function (xml) {
-  var dom = null;
-  var objRecPhyloXML = {};
-  var error = {};
-  var arrayTags = ['clade', 'recGeneTree'];
+// Source : https://stackoverflow.com/questions/4200913/xml-to-javascript-object#19448718
+recTreeVisu.parseRecPhyloXML = function(xml) {
+    var dom = null;
+    var objRecPhyloXML = {};
+    var error = {};
+    var arrayTags = ['clade', 'recGeneTree'];
 
-  if (window.DOMParser) {
-    dom = (new DOMParser()).parseFromString(xml, 'text/xml');
-  } else if (window.ActiveXObject) {
-    dom = new ActiveXObject('Microsoft.XMLDOM');
-    dom.async = false;
-    if (!dom.loadXML(xml)) {
-      error.msg = dom.parseError.reason + ' ' + dom.parseError.srcText;
-      throw error;
-    }
-  } else {
-    error.msg = 'cannot parse xml string!';
-    throw error;
-  }
-
-  function isArray (o) {
-    return Object.prototype.toString.apply(o) === '[object Array]';
-  }
-
-  function parseNode (xmlNode, objRecPhyloXML, xmlNodeParent) {
-    var length;
-    var i;
-
-    if (xmlNodeParent.nodeName === 'name') {
-      objRecPhyloXML['value'] = xmlNode.nodeValue;
-      return;
-    }
-
-    if (xmlNode.nodeName === '#text' && xmlNode.nodeValue.trim() === '') {
-      return;
-    }
-
-    var jsonNode = {};
-    var existing = objRecPhyloXML[xmlNode.nodeName];
-
-    if (xmlNodeParent.nodeName !== 'eventsRec') {
-      if (existing) {
-        if (!isArray(existing)) {
-          objRecPhyloXML[xmlNode.nodeName] = [existing, jsonNode];
-        } else {
-          objRecPhyloXML[xmlNode.nodeName].push(jsonNode);
+    if (window.DOMParser) {
+        dom = (new DOMParser()).parseFromString(xml, 'text/xml');
+    } else if (window.ActiveXObject) {
+        dom = new ActiveXObject('Microsoft.XMLDOM');
+        dom.async = false;
+        if (!dom.loadXML(xml)) {
+            error.msg = dom.parseError.reason + ' ' + dom.parseError.srcText;
+            throw error;
         }
-      } else {
-        if (arrayTags && arrayTags.indexOf(xmlNode.nodeName) !== -1) {
-          objRecPhyloXML[xmlNode.nodeName] = [jsonNode];
-        } else {
-          objRecPhyloXML[xmlNode.nodeName] = jsonNode;
+    } else {
+        error.msg = 'cannot parse xml string!';
+        throw error;
+    }
+
+    function isArray(o) {
+        return Object.prototype.toString.apply(o) === '[object Array]';
+    }
+
+    function parseNode(xmlNode, objRecPhyloXML, xmlNodeParent) {
+        var length;
+        var i;
+
+        if (xmlNodeParent.nodeName === 'name') {
+            objRecPhyloXML['value'] = xmlNode.nodeValue;
+            return;
         }
-      }
+
+        if (xmlNode.nodeName === '#text' && xmlNode.nodeValue.trim() === '') {
+            return;
+        }
+
+        var jsonNode = {};
+        var existing = objRecPhyloXML[xmlNode.nodeName];
+
+        if (xmlNodeParent.nodeName !== 'eventsRec') {
+            if (existing) {
+                if (!isArray(existing)) {
+                    objRecPhyloXML[xmlNode.nodeName] = [existing, jsonNode];
+                } else {
+                    objRecPhyloXML[xmlNode.nodeName].push(jsonNode);
+                }
+            } else {
+                if (arrayTags && arrayTags.indexOf(xmlNode.nodeName) !== -1) {
+                    objRecPhyloXML[xmlNode.nodeName] = [jsonNode];
+                } else {
+                    objRecPhyloXML[xmlNode.nodeName] = jsonNode;
+                }
+            }
+        }
+
+        if (xmlNode.attributes) {
+            length = xmlNode.attributes.length;
+            for (i = 0; i < length; i++) {
+                var attribute = xmlNode.attributes[i];
+                jsonNode[attribute.nodeName] = attribute.nodeValue;
+            }
+        }
+
+        if (xmlNode.nodeName === 'eventsRec') {
+            jsonNode.listEvents = [];
+        }
+
+        if (xmlNodeParent.nodeName === 'eventsRec') {
+            var name = xmlNode.nodeName;
+            var obj = {
+                name: name,
+                attr: jsonNode
+            };
+            objRecPhyloXML.listEvents.push(obj);
+        }
+
+        length = xmlNode.childNodes.length;
+        // Rajout perso
+
+        for (i = 0; i < length; i++) {
+            parseNode(xmlNode.childNodes[i], jsonNode, xmlNode);
+        }
     }
 
-    if (xmlNode.attributes) {
-      length = xmlNode.attributes.length;
-      for (i = 0; i < length; i++) {
-        var attribute = xmlNode.attributes[i];
-        jsonNode[attribute.nodeName] = attribute.nodeValue;
-      }
+    if (dom.childNodes.length) {
+        parseNode(dom.childNodes[0], objRecPhyloXML, {});
     }
 
-    if (xmlNode.nodeName === 'eventsRec') {
-      jsonNode.listEvents = [];
+    // assert
+    if (!objRecPhyloXML.recPhylo) {
+        window.alert('Error during parse recPhyloXML.');
+        error.msg = 'Error during parse recPhyloXML.';
+        throw error;
     }
 
-    if (xmlNodeParent.nodeName === 'eventsRec') {
-      var name = xmlNode.nodeName;
-      var obj = {
-        name: name,
-        attr: jsonNode
-      };
-      objRecPhyloXML.listEvents.push(obj);
-    }
+    objRecPhyloXML = _getRootsClades(objRecPhyloXML);
+    _formatWithoutListEvents(objRecPhyloXML);
 
-    length = xmlNode.childNodes.length;
-    // Rajout perso
-
-    for (i = 0; i < length; i++) {
-      parseNode(xmlNode.childNodes[i], jsonNode, xmlNode);
-    }
-  }
-
-  if (dom.childNodes.length) {
-    parseNode(dom.childNodes[0], objRecPhyloXML, {});
-  }
-
-  // assert
-  if (!objRecPhyloXML.recPhylo) {
-    window.alert('Error during parse recPhyloXML.');
-    error.msg = 'Error during parse recPhyloXML.';
-    throw error;
-  }
-
-  objRecPhyloXML = _getRootsClades(objRecPhyloXML);
-  _formatWithoutListEvents(objRecPhyloXML);
-
-  return objRecPhyloXML;
+    return objRecPhyloXML;
 };
 
 // On récupére les clades racines des arbres
-function _getRootsClades (objRecPhyloXML) {
-  var rootsClades = {};
-  var i = 0;
+function _getRootsClades(objRecPhyloXML) {
+    var rootsClades = {};
+    var i = 0;
 
-  // Get clades Root
-  rootsClades.rootSpTree = _.get(objRecPhyloXML, 'recPhylo.spTree.phylogeny.clade[0]');
-  rootsClades.rootsRecGnTrees = _.map(_.get(objRecPhyloXML, 'recPhylo.recGeneTree'), (phylogeny) => {
-    var root = _.get(phylogeny, 'phylogeny.clade[0]');
-    root.idTree = ++i;
-    return root;
-  });
+    // Get clades Root
+    rootsClades.rootSpTree = _.get(objRecPhyloXML, 'recPhylo.spTree.phylogeny.clade[0]');
+    console.log(rootsClades.rootSpTree)
+    if (!rootsClades.rootSpTree) {
+        throw "There is no spTree in your recphyloXML"
+    }
 
-  return rootsClades;
+    rootsClades.rootsRecGnTrees = _.map(_.get(objRecPhyloXML, 'recPhylo.recGeneTree'), (phylogeny) => {
+        var root = _.get(phylogeny, 'phylogeny.clade[0]');
+        root.idTree = ++i;
+        return root;
+    });
+
+    return rootsClades;
 }
 
 // Correction des elements nouveaux lors du parsage inutiles lors du parsage du xml
-function _formatWithoutListEvents (objRecPhyloXML) {
-  var rootsHierarchy,
-    rootsRecGnTrees,
-    rootSpTree,
-    nodes,
-    listEvents,
-    name,
-    clade;
+function _formatWithoutListEvents(objRecPhyloXML) {
+    var rootsHierarchy,
+        rootsRecGnTrees,
+        rootSpTree,
+        nodes,
+        listEvents,
+        name,
+        clade;
 
-  rootsHierarchy = recTreeVisu._computeHierarchy(objRecPhyloXML);
+    rootsHierarchy = recTreeVisu._computeHierarchy(objRecPhyloXML);
 
-  // Dans l'arbre des espèces
-  rootSpTree = rootsHierarchy.rootSpTree;
-  nodes = rootSpTree.descendants();
-  for (var node of nodes) {
-    clade = node.data;
-    // On enlève le name value et on le met dans le name
-    name = clade.name.value;
-    clade.name = name;
-    // On enlève les #comment
-    delete clade['#comment'];
-  }
-
-  // Dans les arbres de gènes
-  rootsRecGnTrees = rootsHierarchy.rootsRecGnTrees;
-  for (var rootRecGnTrees of rootsRecGnTrees) {
-    nodes = rootRecGnTrees.descendants();
-    for (node of nodes) {
-      clade = node.data;
-      // On enlève le listEvents
-      listEvents = clade.eventsRec.listEvents;
-      clade.eventsRec = listEvents;
-      // On format le recEvent
-      for (var ev of listEvents) {
-        ev.eventType = ev.name;
-        delete ev['name'];
-
-        if (ev.attr && ev.attr.speciesLocation) {
-          ev.speciesLocation = ev.attr.speciesLocation;
-        }
-
-        if (ev.attr && ev.attr.destinationSpecies) {
-          ev.destinationSpecies = ev.attr.destinationSpecies;
-        }
-
-        if (ev.attr && ev.attr.geneName) {
-          ev.geneName = ev.attr.geneName;
-        }
-        delete ev['attr'];
-      }
-
-      // On enlève le name value et on le met dans le name
-      name = clade.name.value;
-      clade.name = name;
-      // On enlève les #comment
-      delete clade['#comment'];
+    // Dans l'arbre des espèces
+    rootSpTree = rootsHierarchy.rootSpTree;
+    nodes = rootSpTree.descendants();
+    for (var node of nodes) {
+        clade = node.data;
+        // On enlève le name value et on le met dans le name
+        name = clade.name.value;
+        clade.name = name;
+        // On enlève les #comment
+        delete clade['#comment'];
     }
-  }
+
+    // Dans les arbres de gènes
+    rootsRecGnTrees = rootsHierarchy.rootsRecGnTrees;
+    for (var rootRecGnTrees of rootsRecGnTrees) {
+        nodes = rootRecGnTrees.descendants();
+        for (node of nodes) {
+            clade = node.data;
+            // On enlève le listEvents
+            listEvents = clade.eventsRec.listEvents;
+            clade.eventsRec = listEvents;
+            // On format le recEvent
+            for (var ev of listEvents) {
+                ev.eventType = ev.name;
+                delete ev['name'];
+
+                if (ev.attr && ev.attr.speciesLocation) {
+                    ev.speciesLocation = ev.attr.speciesLocation;
+                }
+
+                if (ev.attr && ev.attr.destinationSpecies) {
+                    ev.destinationSpecies = ev.attr.destinationSpecies;
+                }
+
+                if (ev.attr && ev.attr.geneName) {
+                    ev.geneName = ev.attr.geneName;
+                }
+                delete ev['attr'];
+            }
+
+            // On enlève le name value et on le met dans le name
+            name = clade.name.value;
+            clade.name = name;
+            // On enlève les #comment
+            delete clade['#comment'];
+        }
+    }
 }
 
 // Compute hierarchy data
-recTreeVisu._computeHierarchy = function (rootsClades) {
-  var rootsHierarchy = {};
-  var idTree = 0;
+recTreeVisu._computeHierarchy = function(rootsClades) {
+    var rootsHierarchy = {};
+    var idTree = 0;
 
-  // Compute D3 hierarchical layout
-  function returnClade (d) {
-    return d.clade;
-  }
-
-  rootsHierarchy.rootSpTree = d3.hierarchy(rootsClades.rootSpTree, returnClade);
-  // Add position child from his parent for futur use
-  rootsHierarchy.rootSpTree.each(function (d) {
-    if (d.children && d.children[0]) {
-      d.children[0].data.posChild = 0;
+    // Compute D3 hierarchical layout
+    function returnClade(d) {
+        return d.clade;
     }
 
-    if (d.children && d.children[1]) {
-      d.children[1].data.posChild = 1;
-    }
+    rootsHierarchy.rootSpTree = d3.hierarchy(rootsClades.rootSpTree, returnClade);
+    // Add position child from his parent for futur use
+    rootsHierarchy.rootSpTree.each(function(d) {
+        if (d.children && d.children[0]) {
+            d.children[0].data.posChild = 0;
+        }
 
-    if(d.parent){
-      d.data.posParent = d.parent.data.posChild;
-    }
+        if (d.children && d.children[1]) {
+            d.children[1].data.posChild = 1;
+        }
 
-  });
+        if (d.parent) {
+            d.data.posParent = d.parent.data.posChild;
+        }
 
-  rootsHierarchy.rootsRecGnTrees = _.map(rootsClades.rootsRecGnTrees, (root) => {
-    var rootRecGnTrees = d3.hierarchy(root, returnClade);
-    idTree++;
-    rootRecGnTrees.each(function (d) {
-      d.data.idTree = idTree;
-      if (d.children && d.children[0]) {
-        d.children[0].data.posChild = 0;
-      }
-
-      if (d.children && d.children[1]) {
-        d.children[1].data.posChild = 1;
-      }
     });
-    return rootRecGnTrees;
-  });
 
-  return rootsHierarchy;
-};
-recTreeVisu.flatGenesTrees = function (rootsClades) {
+    rootsHierarchy.rootsRecGnTrees = _.map(rootsClades.rootsRecGnTrees, (root) => {
+        var rootRecGnTrees = d3.hierarchy(root, returnClade);
+        idTree++;
+        rootRecGnTrees.each(function(d) {
+            d.data.idTree = idTree;
+            if (d.children && d.children[0]) {
+                d.children[0].data.posChild = 0;
+            }
+
+            if (d.children && d.children[1]) {
+                d.children[1].data.posChild = 1;
+            }
+        });
+        return rootRecGnTrees;
+    });
+
+    return rootsHierarchy;
+};recTreeVisu.flatGenesTrees = function (rootsClades) {
   var newRootsClades = {
     rootSpTree: undefined,
     rootsRecGnTrees: undefined
@@ -418,192 +422,192 @@ function createNewSubTree (nodeName, nodeEvent) {
  * @Last modified time: 2017-07-13T11:25:11+02:00
  */
 
-recTreeVisu.reconcileTrees = function (rootsClades) {
-  var rootsHierarchy,
-    gnTreesAppendices,
-    deadSpecies;
+recTreeVisu.reconcileTrees = function(rootsClades) {
+    var rootsHierarchy,
+        gnTreesAppendices,
+        deadSpecies;
 
-  rootsHierarchy = recTreeVisu._computeHierarchy(rootsClades);
+    rootsHierarchy = recTreeVisu._computeHierarchy(rootsClades);
 
-  gnTreesAppendices = findGnTreesAppendices(rootsHierarchy.rootsRecGnTrees);
+    gnTreesAppendices = findGnTreesAppendices(rootsHierarchy.rootsRecGnTrees);
 
-  deadSpecies = createDeadSpFromGnTrees(gnTreesAppendices);
+    deadSpecies = createDeadSpFromGnTrees(gnTreesAppendices);
 
-  addDeadSpecies(rootsClades.rootSpTree, deadSpecies);
+    addDeadSpecies(rootsClades.rootSpTree, deadSpecies);
 
-  giveSpeciesLocationForallGenes(rootsClades, gnTreesAppendices);
+    giveSpeciesLocationForallGenes(rootsClades, gnTreesAppendices);
 
-  addChilGnInNewSpecies(rootsClades,deadSpecies);
+    addChilGnInNewSpecies(rootsClades, deadSpecies);
 
-  // IDEA documentNbGeneAndEventInSpTree
-  // Il faudrait utiliser les corridors pour placer les evenements
-  // documentNbGeneAndEventInSpTree(rootsClades);
+    // IDEA documentNbGeneAndEventInSpTree
+    // Il faudrait utiliser les corridors pour placer les evenements
+    // documentNbGeneAndEventInSpTree(rootsClades);
 
-  getGnCorridors(rootsClades);
+    getGnCorridors(rootsClades);
 
-  return rootsClades;
+    return rootsClades;
 };
 
-function findGnTreesAppendices (rootsRecGnTrees) {
-  var speciationOuts,
-    rootRecGnTree,
-    eventType;
-  var gnTreesAppendices = [];
+function findGnTreesAppendices(rootsRecGnTrees) {
+    var speciationOuts,
+        rootRecGnTree,
+        eventType;
+    var gnTreesAppendices = [];
 
-  for (rootRecGnTree of rootsRecGnTrees) {
-    // Find speciationOuts
-    speciationOuts = rootRecGnTree.descendants().filter(function (node) {
-      eventType = node.data.eventsRec[0].eventType;
-      return eventType === 'speciationOut' || eventType === 'speciationOutLoss';
-    });
-    // Search appendices in from speciationOuts
-    gnTreesAppendices.push(speciationOuts.map(function (speciationOut) {
-      speciationOut.data.clade[1].sourceSpecies = speciationOut.data.eventsRec[0].speciesLocation;
-      return speciationOut.data.clade[1];
-    }));
-  }
-  gnTreesAppendices = _.flatten(gnTreesAppendices);
-  return gnTreesAppendices;
+    for (rootRecGnTree of rootsRecGnTrees) {
+        // Find speciationOuts
+        speciationOuts = rootRecGnTree.descendants().filter(function(node) {
+            eventType = node.data.eventsRec[0].eventType;
+            return eventType === 'speciationOut' || eventType === 'speciationOutLoss';
+        });
+        // Search appendices in from speciationOuts
+        gnTreesAppendices.push(speciationOuts.map(function(speciationOut) {
+            speciationOut.data.clade[1].sourceSpecies = speciationOut.data.eventsRec[0].speciesLocation;
+            return speciationOut.data.clade[1];
+        }));
+    }
+    gnTreesAppendices = _.flatten(gnTreesAppendices);
+    return gnTreesAppendices;
 }
 
 // Compare les nouveaux appendices de l'arbre de espèces et les fusionnes pour éviter les doublons out.
-function createDeadSpFromGnTrees (deadSpecies) {
-  var concernSpecies, cs;
-  var keepSpecies = [];
-  var outSp;
+function createDeadSpFromGnTrees(deadSpecies) {
+    var concernSpecies, cs;
+    var keepSpecies = [];
+    var outSp;
 
-  concernSpecies = deadSpecies.map(function (ds) {
-    return ds.sourceSpecies;
-  });
-  concernSpecies = _.uniq(concernSpecies);
+    concernSpecies = deadSpecies.map(function(ds) {
+        return ds.sourceSpecies;
+    });
+    concernSpecies = _.uniq(concernSpecies);
 
-  for (cs of concernSpecies) {
-    outSp = {};
-    outSp.sourceSpecies = cs;
-    outSp.name = cs + '_out';
-    outSp.out = true;
-    keepSpecies.push(outSp);
-  }
-  return keepSpecies;
+    for (cs of concernSpecies) {
+        outSp = {};
+        outSp.sourceSpecies = cs;
+        outSp.name = cs + '_out';
+        outSp.out = true;
+        keepSpecies.push(outSp);
+    }
+    return keepSpecies;
 }
 
 // Ajouter dans l'arbre des espèces
-function addDeadSpecies (rootSpTree, deadSpecies) {
-  var appendix;
-  var sourceSpecies;
-  var node;
-  var newClade;
-  var hierarchySpTree;
-  var childrens;
+function addDeadSpecies(rootSpTree, deadSpecies) {
+    var appendix;
+    var sourceSpecies;
+    var node;
+    var newClade;
+    var hierarchySpTree;
+    var childrens;
 
-  for (appendix of deadSpecies) {
-    newClade = {};
+    for (appendix of deadSpecies) {
+        newClade = {};
 
-    hierarchySpTree = d3.hierarchy(rootSpTree, function (node) {
-      return node.clade;
-    });
+        hierarchySpTree = d3.hierarchy(rootSpTree, function(node) {
+            return node.clade;
+        });
 
-    sourceSpecies = appendix.sourceSpecies;
-    node = findNodeByName(sourceSpecies, hierarchySpTree);
+        sourceSpecies = appendix.sourceSpecies;
+        node = findNodeByName(sourceSpecies, hierarchySpTree);
 
-    childrens = node.data.clade;
-    if (childrens) {
-      newClade.clade = childrens;
+        childrens = node.data.clade;
+        if (childrens) {
+            newClade.clade = childrens;
+        }
+        newClade.name = sourceSpecies + '_0';
+        newClade.sameAsParent = true;
+
+        node.data.clade = [appendix, newClade];
     }
-    newClade.name = sourceSpecies + '_0';
-    newClade.sameAsParent = true;
 
-    node.data.clade = [appendix, newClade];
-  }
-
-  return rootSpTree;
+    return rootSpTree;
 }
 
 // Rechercher un clade par son nom dans l'arbre des espèces
-function findNodeByName (speciesLocation, hierarchySpTree) {
-  var node;
+function findNodeByName(speciesLocation, hierarchySpTree) {
+    var node;
 
-  node = hierarchySpTree.descendants().find(function (n) {
-    return n.data.name === speciesLocation;
-  });
+    node = hierarchySpTree.descendants().find(function(n) {
+        return n.data.name === speciesLocation;
+    });
 
-  // Assert
-  if (!node) {
-    var msg = {};
-    msg.error = 'There is a mismatch in reconcile method; spLocation : ' + speciesLocation.toString();
-    throw msg;
-  }
+    // Assert
+    if (!node) {
+        var msg = {};
+        msg.error = 'There is a mismatch in reconcile method; spLocation : ' + speciesLocation.toString();
+        throw msg;
+    }
 
-  return node;
+    return node;
 }
 
 
 // FIXME
 // IL faut proablement refaire cette méthode
 // Elle permet d'ajouter des noueds dans les novelles espèces créer _0 et _out lors d'une spOut ou un spOutLoss
-function addChilGnInNewSpecies (rootsClades, deadSpecies) {
-  var recTree,
-      concernSpecies;
+function addChilGnInNewSpecies(rootsClades, deadSpecies) {
+    var recTree,
+        concernSpecies;
 
-  concernSpecies = deadSpecies.map(function (ds) {
-    return ds.sourceSpecies;
-  });
-  concernSpecies = _.uniq(concernSpecies);
-
-  recTree = recTreeVisu._computeHierarchy(rootsClades);
-  recTree.rootsRecGnTrees.forEach(function (rootRecGnTree) {
-    allGenes = rootRecGnTree.descendants();
-    allGenes.forEach(function (gn) {
-
-      var speciesLocation = gn.data.eventsRec[0].speciesLocation;
-      var index = concernSpecies.indexOf(speciesLocation);
-
-      if(index !== -1){
-        if(isConcernedBySpecOut(gn)){
-          addChildForMatchedGn(gn);
-        }
-      }
+    concernSpecies = deadSpecies.map(function(ds) {
+        return ds.sourceSpecies;
     });
-  });
+    concernSpecies = _.uniq(concernSpecies);
+
+    recTree = recTreeVisu._computeHierarchy(rootsClades);
+    recTree.rootsRecGnTrees.forEach(function(rootRecGnTree) {
+        allGenes = rootRecGnTree.descendants();
+        allGenes.forEach(function(gn) {
+
+            var speciesLocation = gn.data.eventsRec[0].speciesLocation;
+            var index = concernSpecies.indexOf(speciesLocation);
+
+            if (index !== -1) {
+                if (isConcernedBySpecOut(gn)) {
+                    addChildForMatchedGn(gn);
+                }
+            }
+        });
+    });
 }
 
-function isConcernedBySpecOut (gn) {
+function isConcernedBySpecOut(gn) {
 
-  var eventType = gn.data.eventsRec[0].eventType;
-  var isTheOutChild = !!gn.data.sourceSpecies;
-  //return  (eventType === 'speciation' || eventType === 'leaf') ;
-  return eventType !== "speciationOutLoss" && eventType !== 'speciationOut' && eventType !== 'duplication' && !isTheOutChild;
+    var eventType = gn.data.eventsRec[0].eventType;
+    var isTheOutChild = !!gn.data.sourceSpecies;
+    //return  (eventType === 'speciation' || eventType === 'leaf') ;
+    return eventType !== "speciationOutLoss" && eventType !== 'speciationOut' && eventType !== 'duplication' && !isTheOutChild;
 }
 
 function addChildForMatchedGn(gn) {
 
 
-  if(gn.parent){
-    var name = gn.data.name;
-    var speciesLocationParent = gn.data.eventsRec[0].speciesLocation;
-    var eventsRecParent = [{eventType:'speciationOut', speciesLocation: speciesLocationParent}];
+    if (gn.parent) {
+        var name = gn.data.name;
+        var speciesLocationParent = gn.data.eventsRec[0].speciesLocation;
+        var eventsRecParent = [{ eventType: 'speciationOut', speciesLocation: speciesLocationParent }];
 
 
-    var speciesLocationLoss = gn.data.eventsRec[0].speciesLocation + '_out';
-    var eventsRecLoss = [{eventType:'loss', speciesLocation: speciesLocationLoss}];
-    var lossGn = {
-      name : 'loss',
-      eventsRec : eventsRecLoss,
-      deadOutGn : true,
-      out : true
+        var speciesLocationLoss = gn.data.eventsRec[0].speciesLocation + '_out';
+        var eventsRecLoss = [{ eventType: 'loss', speciesLocation: speciesLocationLoss }];
+        var lossGn = {
+            name: 'loss',
+            eventsRec: eventsRecLoss,
+            deadOutGn: true,
+            out: true
+        }
+
+        gn.data.eventsRec[0].speciesLocation = speciesLocationParent + '_0';
+        gn.data.eventsRec[0].sameSpAsParent = true;
+
+        var clades = [gn.data, lossGn]
+        var newClade = {
+            name: name,
+            eventsRec: eventsRecParent,
+            clade: clades
+        }
+        gn.parent.data.clade[gn.data.posChild] = newClade;
     }
-
-    gn.data.eventsRec[0].speciesLocation = speciesLocationParent+'_0';
-    gn.data.eventsRec[0].sameSpAsParent = true;
-
-    var clades = [gn.data,lossGn]
-    var newClade = {
-      name : name,
-      eventsRec : eventsRecParent,
-      clade : clades
-    }
-    gn.parent.data.clade[gn.data.posChild] = newClade;
-  }
 
 
 
@@ -614,324 +618,320 @@ function addChildForMatchedGn(gn) {
 // TODO: Ecrire giveSpeciesLocationForallGenes
 // Donner à chaque gène une speciesLocation
 // La speciesLocation permet de donner le nombre de gènes par espèces
-function giveSpeciesLocationForallGenes (rootsClades, deadSpecies) {
-  var recTree;
-  var outGns;
-  var outGnsBrothers;
-  var undGns;
+function giveSpeciesLocationForallGenes(rootsClades, deadSpecies) {
+    var recTree;
+    var outGns;
+    var outGnsBrothers;
+    var undGns;
 
-  recTree = recTreeVisu._computeHierarchy(rootsClades);
+    recTree = recTreeVisu._computeHierarchy(rootsClades);
 
 
-  outGns = getOutGns(recTree.rootsRecGnTrees);
-  manageOutGns(outGns, recTree);
-  console.log(outGns);
+    outGns = getOutGns(recTree.rootsRecGnTrees);
+    manageOutGns(outGns, recTree);
 
-  outGnsBrothers = getOutGnsBrothers(outGns,recTree);
-  manageOutGnsBrothers(outGnsBrothers, recTree);
-  console.log(outGnsBrothers);
+    outGnsBrothers = getOutGnsBrothers(outGns, recTree);
+    manageOutGnsBrothers(outGnsBrothers, recTree);
 
-  undGns = getUndGns(recTree.rootsRecGnTrees);
-  manageUndGns(undGns, recTree.rootSpTree);
-  console.log(undGns);
+    undGns = getUndGns(recTree.rootsRecGnTrees);
+    manageUndGns(undGns, recTree.rootSpTree);
 
 }
 
-function getOutGns (rootsRecGnTrees) {
-  var outGn;
-  var allGenes;
-  var result = [];
-  var rootRecGnTree;
+function getOutGns(rootsRecGnTrees) {
+    var outGn;
+    var allGenes;
+    var result = [];
+    var rootRecGnTree;
 
-  for (rootRecGnTree of rootsRecGnTrees) {
-    allGenes = rootRecGnTree.descendants();
-    outGn = allGenes.filter(function (gn) {
-      var eventsRec = gn.data.eventsRec[0];
-      return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'out';
-    });
-    result = result.concat(outGn);
-  }
-  return result;
-}
-
-function manageOutGns(outGns,recTree) {
-  var outGn;
-  var eventsRec;
-  var sourceSpecies;
-
-  for (outGn of outGns) {
-    eventsRec = outGn.data.eventsRec[0];
-    switch (eventsRec.eventType) {
-      case 'bifurcationOut':
-        outGn.data.out = true;
-        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation || outGn.parent.data.eventsRec[0].sourceSpecies;
-
-        if(!outGn.parent.data.eventsRec[0].sourceSpecies){
-          outGn.data.eventsRec[0].sourceSpecies = sourceSpecies + '_out';
-        }else {
-          outGn.data.eventsRec[0].sourceSpecies = sourceSpecies;
-        }
-        break;
-      case 'transferBack':
-        outGn.data.out = true;
-        manageTrBack(outGn);
-        break;
-      case 'loss':
-        outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
-        break;
-      default:
-        recTreeVisu.error('Evenement non autorisé: ' + eventsRec.eventType);
+    for (rootRecGnTree of rootsRecGnTrees) {
+        allGenes = rootRecGnTree.descendants();
+        outGn = allGenes.filter(function(gn) {
+            var eventsRec = gn.data.eventsRec[0];
+            return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'out';
+        });
+        result = result.concat(outGn);
     }
-  }
+    return result;
 }
 
-function manageTrBack (outGn) {
+function manageOutGns(outGns, recTree) {
+    var outGn;
+    var eventsRec;
+    var sourceSpecies;
+
+    for (outGn of outGns) {
+        eventsRec = outGn.data.eventsRec[0];
+        switch (eventsRec.eventType) {
+            case 'bifurcationOut':
+                outGn.data.out = true;
+                sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation || outGn.parent.data.eventsRec[0].sourceSpecies;
+
+                if (!outGn.parent.data.eventsRec[0].sourceSpecies) {
+                    outGn.data.eventsRec[0].sourceSpecies = sourceSpecies + '_out';
+                } else {
+                    outGn.data.eventsRec[0].sourceSpecies = sourceSpecies;
+                }
+                break;
+            case 'transferBack':
+                outGn.data.out = true;
+                manageTrBack(outGn);
+                break;
+            case 'loss':
+                outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation;
+                break;
+            default:
+                recTreeVisu.error('Evenement non autorisé: ' + eventsRec.eventType);
+        }
+    }
+}
+
+function manageTrBack(outGn) {
     var parentCl = outGn.parent.data;
     var parentEventType = parentCl.eventsRec[0].eventType;
     var sourceSpecies;
 
     switch (parentEventType) {
-      case 'bifurcationOut':
-        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].sourceSpecies;
-        outGn.data.eventsRec[0].speciesLocation = sourceSpecies;
-        break;
-      case 'speciationOut':
-      case 'speciationOutLoss':
-        sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation;
-        outGn.data.eventsRec[0].speciesLocation =  sourceSpecies + '_out';
-        break;
-      default:
-        recTreeVisu.error('Evenement parent non autorisé: ' + parentEventType);
+        case 'bifurcationOut':
+            sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].sourceSpecies;
+            outGn.data.eventsRec[0].speciesLocation = sourceSpecies;
+            break;
+        case 'speciationOut':
+        case 'speciationOutLoss':
+            sourceSpecies = outGn.data.sourceSpecies || outGn.parent.data.eventsRec[0].speciesLocation;
+            outGn.data.eventsRec[0].speciesLocation = sourceSpecies + '_out';
+            break;
+        default:
+            recTreeVisu.error('Evenement parent non autorisé: ' + parentEventType);
     }
     //outGn.data.eventsRec[0].speciesLocation = outGn.parent.data.eventsRec[0].speciesLocation+ '_out';
 }
 
 function getOutGnsBrothers(outGns) {
-  var outGn,
-      parentEventType,
-      posChild,
-      posBrotherChild,
-      brother,
-      outGnsBrothers = [];
+    var outGn,
+        parentEventType,
+        posChild,
+        posBrotherChild,
+        brother,
+        outGnsBrothers = [];
 
-  for (outGn of outGns) {
-    parentEventType = outGn.parent.data.eventsRec[0].eventType;
-    if(parentEventType === 'speciationOut' || parentEventType === 'speciationOutLoss'){
-      posChild = outGn.data.posChild;
-      posBrotherChild = posChild  === 1 ? 0 : 1;
-      brother = outGn.parent.data.clade[posBrotherChild];
-      outGnsBrothers.push(brother)
+    for (outGn of outGns) {
+        parentEventType = outGn.parent.data.eventsRec[0].eventType;
+        if (parentEventType === 'speciationOut' || parentEventType === 'speciationOutLoss') {
+            posChild = outGn.data.posChild;
+            posBrotherChild = posChild === 1 ? 0 : 1;
+            brother = outGn.parent.data.clade[posBrotherChild];
+            outGnsBrothers.push(brother)
+        }
     }
-  }
-  return outGnsBrothers;
+    return outGnsBrothers;
 }
 
 
-function manageOutGnsBrothers (outGnsBrothers, recTree) {
-  var outGnsBrother,
-      speciesLocation;
+function manageOutGnsBrothers(outGnsBrothers, recTree) {
+    var outGnsBrother,
+        speciesLocation;
 
-  for (outGnsBrother of outGnsBrothers) {
-    outGnsBrother.eventsRec[0].speciesLocation = outGnsBrother.eventsRec[0].speciesLocation + '_0';
-  }
+    for (outGnsBrother of outGnsBrothers) {
+        outGnsBrother.eventsRec[0].speciesLocation = outGnsBrother.eventsRec[0].speciesLocation + '_0';
+    }
 
 }
 
 function getUndGns(rootsRecGnTrees) {
-  var outGn;
-  var allGenes;
-  var result = [];
-  var rootRecGnTree;
+    var outGn;
+    var allGenes;
+    var result = [];
+    var rootRecGnTree;
 
-  for (rootRecGnTree of rootsRecGnTrees) {
-    allGenes = rootRecGnTree.descendants();
-    outGn = allGenes.filter(function (gn) {
-      var eventsRec = gn.data.eventsRec[0];
-      return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'undefined';
-    });
-    result = result.concat(outGn);
-  }
-  return result;
+    for (rootRecGnTree of rootsRecGnTrees) {
+        allGenes = rootRecGnTree.descendants();
+        outGn = allGenes.filter(function(gn) {
+            var eventsRec = gn.data.eventsRec[0];
+            return !eventsRec.speciesLocation || eventsRec.speciesLocation === 'undefined';
+        });
+        result = result.concat(outGn);
+    }
+    return result;
 }
 
-function manageUndGns(undGns,rootSpTree) {
-  var undGn,
-      posChild,
-      posBrotherChild,
-      brotherSpLocation,
-      brotherSp,
-      posBrotherSp,
-      posSp,
-      spLocation;
+function manageUndGns(undGns, rootSpTree) {
+    var undGn,
+        posChild,
+        posBrotherChild,
+        brotherSpLocation,
+        brotherSp,
+        posBrotherSp,
+        posSp,
+        spLocation;
 
-  for (undGn of undGns) {
-    if(undGn.data.eventsRec[0].sourceSpecies){
-      undGn.data.eventsRec[0].speciesLocation = undGn.data.eventsRec[0].sourceSpecies;
-    }else {
-      posChild = undGn.data.posChild;
-      posBrotherChild = posChild  === 1 ? 0 : 1;
-      brotherSpLocation = undGn.parent.data.clade[posBrotherChild].eventsRec[0].speciesLocation;
-      brotherSp = findNodeByName(brotherSpLocation,rootSpTree);
-      posBrotherSp = brotherSp.data.posChild;
-      posSp = posBrotherSp  === 1 ? 0 : 1;
-      spLocation = brotherSp.parent.data.clade[posSp].name;
-      undGn.data.eventsRec[0].speciesLocation = spLocation;
+    for (undGn of undGns) {
+        if (undGn.data.eventsRec[0].sourceSpecies) {
+            undGn.data.eventsRec[0].speciesLocation = undGn.data.eventsRec[0].sourceSpecies;
+        } else {
+            posChild = undGn.data.posChild;
+            posBrotherChild = posChild === 1 ? 0 : 1;
+            brotherSpLocation = undGn.parent.data.clade[posBrotherChild].eventsRec[0].speciesLocation;
+            brotherSp = findNodeByName(brotherSpLocation, rootSpTree);
+            posBrotherSp = brotherSp.data.posChild;
+            posSp = posBrotherSp === 1 ? 0 : 1;
+            spLocation = brotherSp.parent.data.clade[posSp].name;
+            undGn.data.eventsRec[0].speciesLocation = spLocation;
+        }
     }
-  }
 }
 
 // Cette fonction associe les pointeurs d'espèces et de gènes entre eux
-function CreateGenesArrayInEachSp (recTree) {
-  var rootRecGnTree;
-  var gnNodes;
-  var gnNode;
-  var speciesLocation;
-  var species;
-  var speciesCl;
-  var gnClade;
-  var genes;
+function CreateGenesArrayInEachSp(recTree) {
+    var rootRecGnTree;
+    var gnNodes;
+    var gnNode;
+    var speciesLocation;
+    var species;
+    var speciesCl;
+    var gnClade;
+    var genes;
 
-  for (rootRecGnTree of recTree.rootsRecGnTrees) {
-    gnNodes = rootRecGnTree.descendants();
-    for (gnNode of gnNodes) {
+    for (rootRecGnTree of recTree.rootsRecGnTrees) {
+        gnNodes = rootRecGnTree.descendants();
+        for (gnNode of gnNodes) {
 
-      speciesLocation = gnNode.data.eventsRec[0].speciesLocation;
-      species = findNodeByName(speciesLocation, recTree.rootSpTree);
+            speciesLocation = gnNode.data.eventsRec[0].speciesLocation;
+            species = findNodeByName(speciesLocation, recTree.rootSpTree);
 
-      speciesCl = species.data;
-      gnClade = gnNode.data;
+            speciesCl = species.data;
+            gnClade = gnNode.data;
 
-      if (!speciesCl.genes) {
-        speciesCl.genes = [];
-      }
-      genes = speciesCl.genes;
-      genes.push(gnClade);
+            if (!speciesCl.genes) {
+                speciesCl.genes = [];
+            }
+            genes = speciesCl.genes;
+            genes.push(gnClade);
 
-      gnClade.species = species.data;
+            gnClade.species = species.data;
+        }
     }
-  }
 }
 
 // On donne à chaque gènes un numéro de corridor dans l'espèces
-function getGnCorridors (rootsClades) {
-  var recTree;
+function getGnCorridors(rootsClades) {
+    var recTree;
 
-  recTree = recTreeVisu._computeHierarchy(rootsClades);
+    recTree = recTreeVisu._computeHierarchy(rootsClades);
 
-  // FIXME changer le nom de la fonction CreateGenesArrayInEachSp
-  CreateGenesArrayInEachSp(recTree);
+    // FIXME changer le nom de la fonction CreateGenesArrayInEachSp
+    CreateGenesArrayInEachSp(recTree);
 
-  for (rootRecGnTree of recTree.rootsRecGnTrees) {
-    updateCorridors(rootRecGnTree,recTree);
-    updateNbEvents(rootRecGnTree,recTree);
-  }
+    for (rootRecGnTree of recTree.rootsRecGnTrees) {
+        updateCorridors(rootRecGnTree, recTree);
+        updateNbEvents(rootRecGnTree, recTree);
+    }
 }
 
-function updateCorridors (node,recTree) {
-  var nodeEventType,
-      child,
-      childEventType,
-      children,
-      corridor;
+function updateCorridors(node, recTree) {
+    var nodeEventType,
+        child,
+        childEventType,
+        children,
+        corridor;
 
-  // On fait la récursion
-  children = node.children;
+    // On fait la récursion
+    children = node.children;
 
-  if(children){
-    for (child of children) {
-      updateCorridors(child,recTree);
+    if (children) {
+        for (child of children) {
+            updateCorridors(child, recTree);
+        }
     }
-  }
 
-  if(!node.data.species.nbCorridors){
-    node.data.species.nbCorridors = 0;
-  }
+    if (!node.data.species.nbCorridors) {
+        node.data.species.nbCorridors = 0;
+    }
 
-  // On associe le corridor et l'evenement à chaque espèce
-  nodeEventType = node.data.eventsRec[0].eventType;
+    // On associe le corridor et l'evenement à chaque espèce
+    nodeEventType = node.data.eventsRec[0].eventType;
 
-  switch (nodeEventType) {
-    case 'loss':
-    case 'leaf':
-    case 'speciation':
-    case 'speciationLoss':
-    case 'speciationOut':
-    case 'speciationOutLoss':
-      if(!node.data.deadOutGn){
-        ++node.data.species.nbCorridors;
-      }
-      break;
-    case 'bifurcationOut':
-    case 'duplication':
-    case 'transferBack':
-      break;
-    default:
-      recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
-  }
+    switch (nodeEventType) {
+        case 'loss':
+        case 'leaf':
+        case 'speciation':
+        case 'speciationLoss':
+        case 'speciationOut':
+        case 'speciationOutLoss':
+            if (!node.data.deadOutGn) {
+                ++node.data.species.nbCorridors;
+            }
+            break;
+        case 'bifurcationOut':
+        case 'duplication':
+        case 'transferBack':
+            break;
+        default:
+            recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
+    }
 
-  node.data.idCorridor = node.data.species.nbCorridors;
+    node.data.idCorridor = node.data.species.nbCorridors;
 
 }
 
 // IDEA ya moyen de faire mieux :)
-function updateNbEvents (node,recTree) {
-  var nodeEventType,
-      child,
-      childEventType,
-      children;
+function updateNbEvents(node, recTree) {
+    var nodeEventType,
+        child,
+        childEventType,
+        children;
 
-  if(!node.data.species.nbGnEvents){
-    node.data.species.nbGnEvents = 0;
-  }
+    if (!node.data.species.nbGnEvents) {
+        node.data.species.nbGnEvents = 0;
+    }
 
-  if(!node.data.species.currentNbGnEvents){
-    node.data.species.currentNbGnEvents = 0;
-  }
+    if (!node.data.species.currentNbGnEvents) {
+        node.data.species.currentNbGnEvents = 0;
+    }
 
-  // On associe le corridor et l'evenement à chaque espèce
-  nodeEventType = node.data.eventsRec[0].eventType;
+    // On associe le corridor et l'evenement à chaque espèce
+    nodeEventType = node.data.eventsRec[0].eventType;
 
-  switch (nodeEventType) {
-    case 'loss':
-    case 'leaf':
-    case 'speciation':
-    case 'speciationLoss':
-    case 'speciationOut':
-    case 'speciationOutLoss':
-      node.data.idEvent= node.data.species.currentNbGnEvents;
-      break;
+    switch (nodeEventType) {
+        case 'loss':
+        case 'leaf':
+        case 'speciation':
+        case 'speciationLoss':
+        case 'speciationOut':
+        case 'speciationOutLoss':
+            node.data.idEvent = node.data.species.currentNbGnEvents;
+            break;
 
-    case 'bifurcationOut':
-    case 'duplication':
-    case 'transferBack':
-      node.data.idEvent= node.data.species.currentNbGnEvents;
-      updateNbGnEvents(node.data.species);
-      break;
-    default:
-      recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
-  }
+        case 'bifurcationOut':
+        case 'duplication':
+        case 'transferBack':
+            node.data.idEvent = node.data.species.currentNbGnEvents;
+            updateNbGnEvents(node.data.species);
+            break;
+        default:
+            recTreeVisu.error('Evenement non autorisé: ' + nodeEventType);
+    }
 
-  // On fait la récursion
-  children = node.children;
-  if(children){
-    updateNbEvents(children[0],recTree);
-    updateNbEvents(children[1],recTree);
-  }
+    // On fait la récursion
+    children = node.children;
+    if (children) {
+        updateNbEvents(children[0], recTree);
+        updateNbEvents(children[1], recTree);
+    }
 
 }
 
 function updateNbGnEvents(species) {
-  var currentNbGnEvents,
-      nbGnEvents;
+    var currentNbGnEvents,
+        nbGnEvents;
 
-  currentNbGnEvents = species.currentNbGnEvents++;
-  nbGnEvents = species.nbGnEvents
+    currentNbGnEvents = species.currentNbGnEvents++;
+    nbGnEvents = species.nbGnEvents
 
-  if( currentNbGnEvents > nbGnEvents){
-    species.nbGnEvents = currentNbGnEvents;
-  }
-}
-/**
+    if (currentNbGnEvents > nbGnEvents) {
+        species.nbGnEvents = currentNbGnEvents;
+    }
+}/**
 * @Author: Guillaume GENCE <guigen>
 * @Date:   2017-07-05T14:11:52+02:00
 * @Email:  guillaume.gence@univ-lyon1.fr
@@ -1157,454 +1157,453 @@ function _inOrderTraversal (callback) {
  * @Last modified time: 2017-07-05T16:27:39+02:00
  */
 
-recTreeVisu.render = function (recTree, domContainerId) {
+recTreeVisu.render = function(recTree, domContainerId) {
 
-  var svg = d3.select(domContainerId)
-            .append('svg')
-            .attr('width', recTree.rootSpTree.sizeX + 500)
-            .attr('height', recTree.rootSpTree.sizeY + 500)
-            .append('g')
-            .attr('transform', function (d) {
-              return 'translate(' + 50 + ',' + 50 + ')';
-            });
+    var svg = d3.select(domContainerId)
+        .append('svg')
+        .attr('width', recTree.rootSpTree.sizeX + 500)
+        .attr('height', recTree.rootSpTree.sizeY + 500)
+        .append('g')
+        .attr('transform', function(d) {
+            return 'translate(' + 50 + ',' + 50 + ')';
+        });
 
-  _drawSpTree(recTree.rootSpTree, svg);
-  _drawGenesTrees(recTree.rootsRecGnTrees, svg);
+    _drawSpTree(recTree.rootSpTree, svg);
+    _drawGenesTrees(recTree.rootsRecGnTrees, svg);
 };
 
-function _drawSpTree (rootSpTree, svg) {
+function _drawSpTree(rootSpTree, svg) {
 
-  svg = svg.append('g')
-  .attr('class', 'spTree')
-  .style('fill', 'none')
-  .style('stroke', 'black')
+    svg = svg.append('g')
+        .attr('class', 'spTree')
+        .style('fill', 'none')
+        .style('stroke', 'black')
 
-  var nodes = svg.selectAll('.node')
-    .data(rootSpTree.descendants())
-    .enter()
-    .append('g')
-    .attr('transform', function (d) {
-      console.log(d);
-      return 'translate(' + d.data.speciesTopStartX + ',' + (d.data.speciesTopStartY - 5) + ')';
+    var nodes = svg.selectAll('.node')
+        .data(rootSpTree.descendants())
+        .enter()
+        .append('g')
+        .attr('transform', function(d) {
+            return 'translate(' + d.data.speciesTopStartX + ',' + (d.data.speciesTopStartY - 5) + ')';
+        });
+
+    nodes.append('text')
+        .text(function(d) {
+            var name = d.data.name;
+
+            //  if (d.data.sameAsParent) {
+            //    name = d.parent.data.name;
+            //  }
+            return name;
+        });
+
+    var links = rootSpTree.links();
+
+    var leftLinks = links.filter(function(d) {
+        return d.target.data.posChild === 0;
     });
 
-  nodes.append('text')
-       .text(function (d) {
-         var name = d.data.name;
+    var rightLinks = links.filter(function(d) {
+        return d.target.data.posChild === 1;
+    });
 
-        //  if (d.data.sameAsParent) {
-        //    name = d.parent.data.name;
-        //  }
-         return name;
-       });
+    for (var descendant of rootSpTree.descendants()) {
+        descendant.color = randomColor({ luminosity: 'dark' });
+    }
 
-  var links = rootSpTree.links();
+    svg.selectAll('.leftLinks')
+        .data(leftLinks)
+        .enter()
+        .append('path')
+        .attr('class', 'leftLinks')
+        .attr('d', _diagonalLinkLeft);
 
-  var leftLinks = links.filter(function (d) {
-    return d.target.data.posChild === 0;
-  });
+    svg.selectAll('.rightLinks')
+        .data(rightLinks)
+        .enter()
+        .append('path')
+        .attr('class', 'rightLinks')
+        .attr('d', _diagonalLinkRight);
 
-  var rightLinks = links.filter(function (d) {
-    return d.target.data.posChild === 1;
-  });
-
-  for (var descendant of rootSpTree.descendants()) {
-    descendant.color = randomColor({luminosity: 'dark'});
-  }
-
-  svg.selectAll('.leftLinks')
-  .data(leftLinks)
-  .enter()
-  .append('path')
-  .attr('class', 'leftLinks')
-  .attr('d', _diagonalLinkLeft);
-
-  svg.selectAll('.rightLinks')
-  .data(rightLinks)
-  .enter()
-  .append('path')
-  .attr('class', 'rightLinks')
-  .attr('d', _diagonalLinkRight);
-
-  var leaves = rootSpTree.leaves();
-  svg.selectAll('.leaves')
-  .data(leaves)
-  .enter()
-  .append('path')
-  .attr('class', 'leaves')
-  .attr('d', _leavesContainer);
+    var leaves = rootSpTree.leaves();
+    svg.selectAll('.leaves')
+        .data(leaves)
+        .enter()
+        .append('path')
+        .attr('class', 'leaves')
+        .attr('d', _leavesContainer);
 }
 
-function _diagonalLinkLeft (d) {
-  var path = d3.path();
-  var elbowPositionX;
-  var elbowPositionY = d.source.container.stop.up.y;
-  var isSpOut = d.target.data.sourceSpecies;
+function _diagonalLinkLeft(d) {
+    var path = d3.path();
+    var elbowPositionX;
+    var elbowPositionY = d.source.container.stop.up.y;
+    var isSpOut = d.target.data.sourceSpecies;
 
 
-  if(!isSpOut){
-    elbowPositionX = d.source.container.stop.down.x;
-  }else {
-    elbowPositionX = d.target.container.start.up.x - d.target.speciesHeight;
-  }
+    if (!isSpOut) {
+        elbowPositionX = d.source.container.stop.down.x;
+    } else {
+        elbowPositionX = d.target.container.start.up.x - d.target.speciesHeight;
+    }
 
 
-  path.moveTo(d.source.container.start.up.x, elbowPositionY);
-  path.lineTo(elbowPositionX, elbowPositionY);
-  path.lineTo(elbowPositionX, d.target.container.start.up.y);
-  path.lineTo(d.target.container.start.up.x, d.target.container.start.up.y);
-
-  if (!isSpOut) {
-    path.moveTo(d.target.x, d.source.y);
-  } else {
-    path.moveTo(d.target.x, d.source.container.start.up.y);
-  }
-  path.lineTo(d.target.container.start.down.x, d.target.container.start.down.y);
-
-  return path.toString();
-}
-
-function _diagonalLinkRight (d) {
-  var path = d3.path();
-  var elbowPositionX = d.source.container.stop.down.x ;
-  var elbowPositionY = d.source.container.stop.down.y;
-
-  path.moveTo(d.source.container.start.down.x, elbowPositionY);
-  path.lineTo(elbowPositionX, elbowPositionY);
-  path.lineTo(elbowPositionX, d.target.container.start.down.y);
-  path.lineTo(d.target.container.start.down.x, d.target.container.start.down.y);
-
-  if (!d.target.data.sameAsParent) {
-    path.moveTo(d.target.x, d.source.y);
+    path.moveTo(d.source.container.start.up.x, elbowPositionY);
+    path.lineTo(elbowPositionX, elbowPositionY);
+    path.lineTo(elbowPositionX, d.target.container.start.up.y);
     path.lineTo(d.target.container.start.up.x, d.target.container.start.up.y);
-  }
 
-  return path.toString();
+    if (!isSpOut) {
+        path.moveTo(d.target.x, d.source.y);
+    } else {
+        path.moveTo(d.target.x, d.source.container.start.up.y);
+    }
+    path.lineTo(d.target.container.start.down.x, d.target.container.start.down.y);
+
+    return path.toString();
 }
 
-function _leavesContainer (d) {
-  var path = d3.path();
-  path.moveTo(d.container.start.up.x, d.container.start.up.y);
-  path.lineTo(d.container.x, d.container.stop.up.y);
-  path.lineTo(d.container.x, d.container.stop.down.y);
-  path.lineTo(d.container.start.down.x, d.container.start.down.y);
+function _diagonalLinkRight(d) {
+    var path = d3.path();
+    var elbowPositionX = d.source.container.stop.down.x;
+    var elbowPositionY = d.source.container.stop.down.y;
 
-  d.data.speciesEndX = d.container.x;
-  d.data.speciesEndY = d.container.y;
+    path.moveTo(d.source.container.start.down.x, elbowPositionY);
+    path.lineTo(elbowPositionX, elbowPositionY);
+    path.lineTo(elbowPositionX, d.target.container.start.down.y);
+    path.lineTo(d.target.container.start.down.x, d.target.container.start.down.y);
 
-  return path.toString();
+    if (!d.target.data.sameAsParent) {
+        path.moveTo(d.target.x, d.source.y);
+        path.lineTo(d.target.container.start.up.x, d.target.container.start.up.y);
+    }
+
+    return path.toString();
+}
+
+function _leavesContainer(d) {
+    var path = d3.path();
+    path.moveTo(d.container.start.up.x, d.container.start.up.y);
+    path.lineTo(d.container.x, d.container.stop.up.y);
+    path.lineTo(d.container.x, d.container.stop.down.y);
+    path.lineTo(d.container.start.down.x, d.container.start.down.y);
+
+    d.data.speciesEndX = d.container.x;
+    d.data.speciesEndY = d.container.y;
+
+    return path.toString();
 }
 
 
 
-function _drawGenesTrees (rootsRecGnTrees, svg) {
-  rootsRecGnTrees.forEach(rootRecGnTree => _drawGenesTree(rootRecGnTree, svg) );
+function _drawGenesTrees(rootsRecGnTrees, svg) {
+    rootsRecGnTrees.forEach(rootRecGnTree => _drawGenesTree(rootRecGnTree, svg));
 }
 
 function colores_google(n) {
-  var colores_g = ["#109618", "#3366cc", "#dc3912", "#ff9900", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
-  return colores_g[n % colores_g.length];
+    var colores_g = ["#109618", "#3366cc", "#dc3912", "#ff9900", "#990099", "#0099c6", "#dd4477", "#66aa00", "#b82e2e", "#316395", "#994499", "#22aa99", "#aaaa11", "#6633cc", "#e67300", "#8b0707", "#651067", "#329262", "#5574a6", "#3b3eac"];
+    return colores_g[n % colores_g.length];
 }
 
 
 
-function _drawGenesTree (rootRecGnTree, svg) {
-  var idTree = rootRecGnTree.data.idTree;
-  var bold = false;
+function _drawGenesTree(rootRecGnTree, svg) {
+    var idTree = rootRecGnTree.data.idTree;
+    var bold = false;
 
-  svg = svg.append('g')
-  .attr('class', 'gnTree'+idTree)
-  .style('stroke-width',2)
-  .style('cursor','pointer')
-  .on("click", function(d, i) {
-    toggleStrokWidth(this, bold)
-    bold = !bold;
-  });
+    svg = svg.append('g')
+        .attr('class', 'gnTree' + idTree)
+        .style('stroke-width', 2)
+        .style('cursor', 'pointer')
+        .on("click", function(d, i) {
+            toggleStrokWidth(this, bold)
+            bold = !bold;
+        });
 
 
-  svg.selectAll('.leaf'+idTree)
-  .data(  rootRecGnTree.leaves().filter(function (l) {
-      return l.data.eventsRec[0].eventType === 'leaf'
-    }))
-  .enter()
-  .append('g')
-  .attr('class', 'leaf'+idTree)
-  .attr('transform', function (d) {
-        var x = d.data.species.maxX || d.x;
-        return 'translate(' + (x + 10) + ',' + d.y + ')';
-  })
-  .append('text')
-  .style('fill', colores_google(idTree))
-  .text(function (d) {
-    var name = d.data.eventsRec[0].geneName || d.data.name;
-    var location = d.data.eventsRec[0].speciesLocation;
-    return name + ' ('+location+')';
-   });
+    svg.selectAll('.leaf' + idTree)
+        .data(rootRecGnTree.leaves().filter(function(l) {
+            return l.data.eventsRec[0].eventType === 'leaf'
+        }))
+        .enter()
+        .append('g')
+        .attr('class', 'leaf' + idTree)
+        .attr('transform', function(d) {
+            var x = d.data.species.maxX || d.x;
+            return 'translate(' + (x + 10) + ',' + d.y + ')';
+        })
+        .append('text')
+        .style('fill', colores_google(idTree))
+        .text(function(d) {
+            var name = d.data.eventsRec[0].geneName || d.data.name;
+            var location = d.data.eventsRec[0].speciesLocation;
+            return name + ' (' + location + ')';
+        });
 
- var allNodes = rootRecGnTree.descendants();
+    var allNodes = rootRecGnTree.descendants();
 
- // var allNodes = svg.selectAll('.node')
- //   .data(rootRecGnTree.descendants())
- //   .enter()
- //    .append('circle')
- //    .attr('cx', d => d.x)
- //    .attr('cy', d => d.y)
- //    .attr('r', 3);
+    // var allNodes = svg.selectAll('.node')
+    //   .data(rootRecGnTree.descendants())
+    //   .enter()
+    //    .append('circle')
+    //    .attr('cx', d => d.x)
+    //    .attr('cy', d => d.y)
+    //    .attr('r', 3);
 
-  var links = rootRecGnTree.links();
+    var links = rootRecGnTree.links();
 
-  svg.selectAll('.gnLinks'+idTree)
-  .data(links)
-  .enter()
-  .append('path')
-  .attr('class', 'gnLinks'+idTree)
-  .style('fill', 'none')
-  .style('stroke', colores_google(idTree))
-  .style('stroke-dasharray', function (l) {
-    if(l.source.data.eventsRec[0].eventType === "transferBack" && l.target.data.eventsRec[0].eventType !== "loss"){
-      return "5,5";
+    svg.selectAll('.gnLinks' + idTree)
+        .data(links)
+        .enter()
+        .append('path')
+        .attr('class', 'gnLinks' + idTree)
+        .style('fill', 'none')
+        .style('stroke', colores_google(idTree))
+        .style('stroke-dasharray', function(l) {
+            if (l.source.data.eventsRec[0].eventType === "transferBack" && l.target.data.eventsRec[0].eventType !== "loss") {
+                return "5,5";
+            }
+        })
+        .attr('d', computeGnLinks);
+
+    var allLeaves = rootRecGnTree.leaves();
+
+    var leaves = allLeaves.filter(l => l.data.eventsRec[0].eventType === 'leaf');
+
+    svg.selectAll('.gnLeaves' + idTree)
+        .data(leaves)
+        .enter()
+        .append('path')
+        .attr('class', 'gnLeaves' + idTree)
+        .style('fill', 'none')
+        .style('stroke', colores_google(idTree))
+        .attr('d', computeLeafGn);
+
+
+    var losses = allLeaves.filter(function(l) {
+        return l.data.eventsRec[0].eventType === 'loss' && !l.data.deadOutGn;
+    });
+
+    svg.selectAll('.gnLosses' + idTree)
+        .data(losses)
+        .enter()
+        .append('g')
+        .attr('class', 'gnLosses' + idTree)
+        .attr('transform', function(l) {
+            return 'translate(' + l.x + ',' + l.y + ')' + 'rotate(45)';
+        })
+        .append('path')
+        .style('fill', 'white')
+        .style('stroke', colores_google(idTree))
+        .attr('d', computeLossGn);
+
+    var duplications = allNodes.filter(n => n.data.eventsRec[0].eventType === 'duplication' || n.data.eventsRec[0].eventType === 'bifurcationOut');
+
+    svg.selectAll('.duplication' + idTree)
+        .data(duplications)
+        .enter()
+        .append('g')
+        .attr('transform', function(n) {
+            return 'translate(' + n.x + ',' + n.y + ')';
+        })
+        .append('path')
+        .attr('class', 'duplication' + idTree)
+        .attr('d', computeDupGn)
+        .style('fill', 'white')
+        .style('stroke', colores_google(idTree));
+
+    var transferBack = allNodes.filter(n => n.data.eventsRec[0].eventType === 'transferBack');
+
+    svg.selectAll('.transferBack' + idTree)
+        .data(transferBack)
+        .enter()
+        .append('g')
+        .attr('transform', function(n) {
+            return 'translate(' + n.x + ',' + n.y + ')';
+        })
+        .append('path')
+        .attr('class', 'transferBack' + idTree)
+        .attr('d', computeTrBackGn)
+        .style('fill', 'white')
+        .style('stroke', colores_google(idTree));
+
+    var transferBackTarget = allNodes.filter(function(n) {
+        return n.parent && n.parent.data.eventsRec[0].eventType === 'transferBack' && n.data.eventsRec[0].eventType !== 'loss';
+    });
+
+    svg.selectAll('.transferBackTarget' + idTree)
+        .data(transferBackTarget)
+        .enter()
+        .append('g')
+        .attr('transform', function(n) {
+            return 'translate(' + n.x + ',' + n.y + ')' + 'rotate(90)';
+        })
+        .append('path')
+        .attr('class', 'transferBackTarget' + idTree)
+        .attr('d', computeTransferBackTarget)
+        .style('fill', 'white')
+        .style('stroke', colores_google(idTree));
+
+
+    svg.selectAll('.root' + idTree)
+        .data([rootRecGnTree])
+        .enter()
+        .append('g')
+        .attr('transform', function(n) {
+            return 'translate(' + n.x + ',' + n.y + ')' + 'rotate(90)';
+        })
+        .append('path')
+        .attr('class', 'root' + idTree)
+        .attr('d', computeRootGn)
+        .style('fill', 'white')
+        .style('stroke', colores_google(idTree));
+
+}
+
+
+function computeGnLinks(l) {
+
+    var sourceEventType = l.source.data.eventsRec[0].eventType;
+    var linkPath;
+
+    switch (sourceEventType) {
+        case 'speciation':
+        case 'speciationLoss':
+            linkPath = computeSpeciationLinks(l);
+            break;
+        case 'speciationOut':
+        case 'speciationOutLoss':
+            linkPath = computeSpOutLinks(l);
+            break;
+        case 'duplication':
+        case 'bifurcationOut':
+            linkPath = computeDuplicationGnLinks(l);
+            break;
+
+        case 'transferBack':
+            linkPath = computeTrBackLinks(l);
+            break;
+        default:
+
     }
-  })
-  .attr('d', computeGnLinks);
-
-  var allLeaves = rootRecGnTree.leaves();
-
-  var leaves = allLeaves.filter(l => l.data.eventsRec[0].eventType === 'leaf');
-
-  svg.selectAll('.gnLeaves'+idTree)
-  .data(leaves)
-  .enter()
-  .append('path')
-  .attr('class', 'gnLeaves'+idTree)
-  .style('fill', 'none')
-  .style('stroke', colores_google(idTree))
-  .attr('d', computeLeafGn);
-
-
-  var losses = allLeaves.filter(function (l) {
-    return l.data.eventsRec[0].eventType === 'loss' && !l.data.deadOutGn;
-  });
-
-  svg.selectAll('.gnLosses'+idTree)
-  .data(losses)
-  .enter()
-  .append('g')
-  .attr('class', 'gnLosses'+idTree)
-  .attr('transform', function (l) {
-      return 'translate(' + l.x + ',' + l.y + ')' + 'rotate(45)';
-    })
-  .append('path')
-  .style('fill', 'white')
-  .style('stroke', colores_google(idTree))
-  .attr('d', computeLossGn);
-
-  var duplications = allNodes.filter(n => n.data.eventsRec[0].eventType === 'duplication' || n.data.eventsRec[0].eventType === 'bifurcationOut'  );
-
-  svg.selectAll('.duplication'+idTree)
-  .data(duplications)
-  .enter()
-  .append('g')
-  .attr('transform', function (n) {
-      return 'translate(' + n.x + ',' + n.y + ')';
-    })
-  .append('path')
-  .attr('class', 'duplication'+idTree)
-  .attr('d', computeDupGn)
-  .style('fill', 'white')
-  .style('stroke', colores_google(idTree));
-
-  var transferBack = allNodes.filter(n => n.data.eventsRec[0].eventType === 'transferBack');
-
-  svg.selectAll('.transferBack'+idTree)
-  .data(transferBack)
-  .enter()
-  .append('g')
-  .attr('transform', function (n) {
-      return 'translate(' + n.x + ',' + n.y + ')';
-    })
-  .append('path')
-  .attr('class', 'transferBack'+idTree)
-  .attr('d', computeTrBackGn)
-  .style('fill', 'white')
-  .style('stroke', colores_google(idTree));
-
-  var transferBackTarget = allNodes.filter(function (n) {
-    return n.parent && n.parent.data.eventsRec[0].eventType === 'transferBack'&& n.data.eventsRec[0].eventType !== 'loss';
-  });
-
-  svg.selectAll('.transferBackTarget'+idTree)
-  .data(transferBackTarget)
-  .enter()
-  .append('g')
-  .attr('transform', function (n) {
-      return 'translate(' + n.x + ',' + n.y + ')' + 'rotate(90)';
-    })
-  .append('path')
-  .attr('class', 'transferBackTarget'+idTree)
-  .attr('d', computeTransferBackTarget)
-  .style('fill', 'white')
-  .style('stroke', colores_google(idTree));
-
-
-  svg.selectAll('.root'+idTree)
-  .data([rootRecGnTree])
-  .enter()
-  .append('g')
-  .attr('transform', function (n) {
-      return 'translate(' + n.x + ',' + n.y + ')' + 'rotate(90)';
-    })
-  .append('path')
-  .attr('class', 'root'+idTree)
-  .attr('d', computeRootGn)
-  .style('fill', 'white')
-  .style('stroke', colores_google(idTree));
-
-}
-
-
-function computeGnLinks (l) {
-
-  var sourceEventType = l.source.data.eventsRec[0].eventType;
-  var linkPath;
-
-  switch (sourceEventType) {
-    case 'speciation':
-    case 'speciationLoss':
-      linkPath = computeSpeciationLinks(l);
-      break;
-    case 'speciationOut':
-    case 'speciationOutLoss':
-      linkPath = computeSpOutLinks(l);
-      break;
-    case 'duplication':
-    case 'bifurcationOut':
-      linkPath = computeDuplicationGnLinks(l);
-      break;
-
-    case 'transferBack':
-      linkPath = computeTrBackLinks(l);
-      break;
-    default:
-
-  }
-  return linkPath;
+    return linkPath;
 }
 
 // FIXME le positionnement ne doit pas etre croisé
 function computeSpeciationLinks(l) {
-  var source = l.source;
-  var target = l.target;
-  var path = d3.path();
-  var idCorridor = source.data.idCorridor;
-  var speciesTopStartX = target.data.species.speciesTopStartX;
+    var source = l.source;
+    var target = l.target;
+    var path = d3.path();
+    var idCorridor = source.data.idCorridor;
+    var speciesTopStartX = target.data.species.speciesTopStartX;
 
 
-  path.moveTo(source.x, source.y);
-  path.lineTo(speciesTopStartX - (idCorridor * historySize), source.y);
-  path.lineTo(speciesTopStartX - (idCorridor * historySize), target.y);
-  path.lineTo(target.x , target.y);
+    path.moveTo(source.x, source.y);
+    path.lineTo(speciesTopStartX - (idCorridor * historySize), source.y);
+    path.lineTo(speciesTopStartX - (idCorridor * historySize), target.y);
+    path.lineTo(target.x, target.y);
 
-  return path.toString();
+    return path.toString();
 }
 
 function computeDuplicationGnLinks(l) {
 
-  var source = l.source;
-  var target = l.target;
-  var path = d3.path();
+    var source = l.source;
+    var target = l.target;
+    var path = d3.path();
 
-  path.moveTo(source.x, source.y);
-  path.lineTo(target.x, target.y);
-  return path.toString();
+    path.moveTo(source.x, source.y);
+    path.lineTo(target.x, target.y);
+    return path.toString();
 }
 
 
 function computeTrBackLinks(l) {
-  var source = l.source;
-  var target = l.target;
+    var source = l.source;
+    var target = l.target;
 
-  return curvedVertical(source.x, source.y,target.x , target.y);
+    return curvedVertical(source.x, source.y, target.x, target.y);
 }
 
 
 function computeLeafGn(n) {
-  var path = d3.path();
+    var path = d3.path();
 
-  path.moveTo(n.x, n.y);
-  path.lineTo(n.data.species.speciesEndX, n.y);
-  return path.toString();
+    path.moveTo(n.x, n.y);
+    path.lineTo(n.data.species.speciesEndX, n.y);
+    return path.toString();
 }
 
 function computeLossGn(n) {
-  var path = d3.symbol().size(256).type(d3.symbolCross);
-  return path(n);
+    var path = d3.symbol().size(256).type(d3.symbolCross);
+    return path(n);
 }
 
 function computeDupGn(n) {
-  var path = d3.symbol().size(256).type(d3.symbolSquare);
-  return path(n);
+    var path = d3.symbol().size(256).type(d3.symbolSquare);
+    return path(n);
 }
 
 function computeTrBackGn(n) {
-  var path = d3.symbol().size(128).type(d3.symbolDiamond);
-  return path(n);
+    var path = d3.symbol().size(128).type(d3.symbolDiamond);
+    return path(n);
 }
 
 function computeRootGn(n) {
-  var path = d3.symbol().size(256).type(d3.symbolStar);
-  return path(n);
+    var path = d3.symbol().size(256).type(d3.symbolStar);
+    return path(n);
 }
 
 function computeTransferBackTarget(n) {
-  var path = d3.symbol().size(128).type(d3.symbolTriangle);
-  return path(n);
+    var path = d3.symbol().size(128).type(d3.symbolTriangle);
+    return path(n);
 }
 
 
 function computeSpOutLinks(l) {
-  var path = d3.path();
-  var source = l.source;
-  var target = l.target;
-  var idCorridorSrc = source.data.idCorridor;
-  var idCorridorTrg = target.data.idCorridor;
-  var speciesTopStartX = target.data.species.speciesTopStartX;
+    var path = d3.path();
+    var source = l.source;
+    var target = l.target;
+    var idCorridorSrc = source.data.idCorridor;
+    var idCorridorTrg = target.data.idCorridor;
+    var speciesTopStartX = target.data.species.speciesTopStartX;
 
 
-  if(!target.data.deadOutGn){
-    path.moveTo(source.x, source.y);
+    if (!target.data.deadOutGn) {
+        path.moveTo(source.x, source.y);
 
-    if(target.data.out){
-      path.lineTo(speciesTopStartX - (idCorridorTrg * historySize), source.y);
-      path.lineTo(speciesTopStartX - (idCorridorTrg * historySize), target.y);
-      path.lineTo(target.x , target.y);
-    }else {
-      path.lineTo(target.x , target.y);
+        if (target.data.out) {
+            path.lineTo(speciesTopStartX - (idCorridorTrg * historySize), source.y);
+            path.lineTo(speciesTopStartX - (idCorridorTrg * historySize), target.y);
+            path.lineTo(target.x, target.y);
+        } else {
+            path.lineTo(target.x, target.y);
+        }
     }
-  }
 
-  return path;
+    return path;
 }
 
 // Source https://github.com/hughsk/svg-line-curved
 function curvedVertical(x1, y1, x2, y2) {
-  var line = []
-  var mx = x1 + (x2 - x1) / 2
-  var my = y1 + (y2 - y1) / 2
+    var line = []
+    var mx = x1 + (x2 - x1) / 2
+    var my = y1 + (y2 - y1) / 2
 
-  line.push('M', x1, y1)
-  line.push('C', x1, my, x2, my, x2, y2)
+    line.push('M', x1, y1)
+    line.push('C', x1, my, x2, my, x2, y2)
 
-  return line.join(' ')
+    return line.join(' ')
 }
 
-function toggleStrokWidth(gnTreeSvg,bold) {
-  if(!bold){
-    d3.select(gnTreeSvg)
-    .style('stroke-width',5)
-    .style('font-weight','bold');
-  }else {
-    d3.select(gnTreeSvg)
-    .style('stroke-width',2)
-    .style('font-weight','normal');
-  }
+function toggleStrokWidth(gnTreeSvg, bold) {
+    if (!bold) {
+        d3.select(gnTreeSvg)
+            .style('stroke-width', 5)
+            .style('font-weight', 'bold');
+    } else {
+        d3.select(gnTreeSvg)
+            .style('stroke-width', 2)
+            .style('font-weight', 'normal');
+    }
 }
