@@ -1,6 +1,6 @@
 {
     "name": "recphyloxml-visu-reconciliation",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "recphyloXML visualisation genes trees in species tree.",
     "main": "index.js",
     "scripts": {
