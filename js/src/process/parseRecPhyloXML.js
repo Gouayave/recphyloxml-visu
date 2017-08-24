@@ -116,7 +116,7 @@ function _getRootsClades(objRecPhyloXML) {
 
     // Get clades Root
     rootsClades.rootSpTree = _.get(objRecPhyloXML, 'recPhylo.spTree.phylogeny.clade[0]');
-    console.log(rootsClades.rootSpTree)
+
     if (!rootsClades.rootSpTree) {
         throw "There is no spTree in your recphyloXML"
     }
