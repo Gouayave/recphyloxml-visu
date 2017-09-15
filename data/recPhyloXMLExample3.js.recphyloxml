@@ -1,0 +1,1248 @@
+
+
+<recPhylo  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns="http://phylariane.univ-lyon1.fr/recphyloxml"
+ xsi:schemaLocation="./recPhyloXML.xsd">
+  <spTree>
+  <phylogeny rooted="true">
+    <clade>
+      <name>56</name>
+      <clade>
+        <name>54</name>
+        <clade>
+          <name>4</name>
+          <clade>
+            <name>0</name>
+          </clade>
+          <clade>
+            <name>3</name>
+            <clade>
+              <name>1</name>
+            </clade>
+            <clade>
+              <name>2</name>
+            </clade>
+          </clade>
+        </clade>
+        <clade>
+          <name>53</name>
+          <clade>
+            <name>5</name>
+          </clade>
+          <clade>
+            <name>52</name>
+            <clade>
+              <name>28</name>
+              <clade>
+                <name>6</name>
+              </clade>
+              <clade>
+                <name>27</name>
+                <clade>
+                  <name>7</name>
+                </clade>
+                <clade>
+                  <name>26</name>
+                  <clade>
+                    <name>14</name>
+                    <clade>
+                      <name>8</name>
+                    </clade>
+                    <clade>
+                      <name>13</name>
+                      <clade>
+                        <name>9</name>
+                      </clade>
+                      <clade>
+                        <name>12</name>
+                        <clade>
+                          <name>10</name>
+                        </clade>
+                        <clade>
+                          <name>11</name>
+                        </clade>
+                      </clade>
+                    </clade>
+                  </clade>
+                  <clade>
+                    <name>25</name>
+                    <clade>
+                      <name>19</name>
+                      <clade>
+                        <name>15</name>
+                      </clade>
+                      <clade>
+                        <name>18</name>
+                        <clade>
+                          <name>16</name>
+                        </clade>
+                        <clade>
+                          <name>17</name>
+                        </clade>
+                      </clade>
+                    </clade>
+                    <clade>
+                      <name>24</name>
+                      <clade>
+                        <name>20</name>
+                      </clade>
+                      <clade>
+                        <name>23</name>
+                        <clade>
+                          <name>21</name>
+                        </clade>
+                        <clade>
+                          <name>22</name>
+                        </clade>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+            <clade>
+              <name>51</name>
+              <clade>
+                <name>29</name>
+              </clade>
+              <clade>
+                <name>50</name>
+                <clade>
+                  <name>40</name>
+                  <clade>
+                    <name>34</name>
+                    <clade>
+                      <name>30</name>
+                    </clade>
+                    <clade>
+                      <name>33</name>
+                      <clade>
+                        <name>31</name>
+                      </clade>
+                      <clade>
+                        <name>32</name>
+                      </clade>
+                    </clade>
+                  </clade>
+                  <clade>
+                    <name>39</name>
+                    <clade>
+                      <name>35</name>
+                    </clade>
+                    <clade>
+                      <name>38</name>
+                      <clade>
+                        <name>36</name>
+                      </clade>
+                      <clade>
+                        <name>37</name>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+                <clade>
+                  <name>49</name>
+                  <clade>
+                    <name>41</name>
+                  </clade>
+                  <clade>
+                    <name>48</name>
+                    <clade>
+                      <name>42</name>
+                    </clade>
+                    <clade>
+                      <name>47</name>
+                      <clade>
+                        <name>43</name>
+                      </clade>
+                      <clade>
+                        <name>46</name>
+                        <clade>
+                          <name>44</name>
+                        </clade>
+                        <clade>
+                          <name>45</name>
+                        </clade>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+        </clade>
+      </clade>
+      <clade>
+        <name>55</name>
+      </clade>
+    </clade>
+  </phylogeny>
+  </spTree>
+  <recGeneTree>
+  <phylogeny rooted="true">
+    <id>1</id>
+    <clade>
+      <name>0</name>
+      <eventsRec>
+        <speciation speciesLocation="54"></speciation>
+      </eventsRec>
+      <clade>
+        <name>2</name>
+        <eventsRec>
+          <speciationLoss speciesLocation="4"></speciationLoss>
+          <speciationLoss speciesLocation="3"></speciationLoss>
+          <leaf speciesLocation="2" geneName="USMAY1_6_PE27"></leaf>
+        </eventsRec>
+      </clade>
+      <clade>
+        <name>2</name>
+        <eventsRec>
+          <speciation speciesLocation="53"></speciation>
+        </eventsRec>
+        <clade>
+          <name>SCHPO_1_PE1919</name>
+          <eventsRec>
+            <leaf speciesLocation="5" geneName="SCHPO_1_PE1919"></leaf>
+          </eventsRec>
+        </clade>
+        <clade>
+          <name>29</name>
+          <eventsRec>
+            <speciationLoss speciesLocation="52"></speciationLoss>
+            <speciation speciesLocation="51"></speciation>
+          </eventsRec>
+          <clade>
+            <name>YALIP1_7_PE5</name>
+            <eventsRec>
+              <leaf speciesLocation="29" geneName="YALIP1_7_PE5"></leaf>
+            </eventsRec>
+          </clade>
+          <clade>
+            <name>8</name>
+            <eventsRec>
+              <speciation speciesLocation="50"></speciation>
+            </eventsRec>
+            <clade>
+              <name>9</name>
+              <eventsRec>
+                <speciation speciesLocation="40"></speciation>
+              </eventsRec>
+              <clade>
+                <name>19</name>
+                <eventsRec>
+                  <speciation speciesLocation="34"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>LACTH_8_PE193</name>
+                  <eventsRec>
+                    <leaf speciesLocation="30" geneName="LACTH_8_PE193"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>26</name>
+                  <eventsRec>
+                    <speciation speciesLocation="33"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>KLLAC1_6_PE842</name>
+                    <eventsRec>
+                      <leaf speciesLocation="32" geneName="KLLAC1_6_PE842"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>ASHGO_6_PE158</name>
+                    <eventsRec>
+                      <leaf speciesLocation="31" geneName="ASHGO_6_PE158"></leaf>
+                    </eventsRec>
+                  </clade>
+                </clade>
+              </clade>
+              <clade>
+                <name>20</name>
+                <eventsRec>
+                  <speciation speciesLocation="39"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>ZYGRO_7_PE350</name>
+                  <eventsRec>
+                    <leaf speciesLocation="35" geneName="ZYGRO_7_PE350"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>22</name>
+                  <eventsRec>
+                    <speciation speciesLocation="38"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>CAGLA1_8_PE390</name>
+                    <eventsRec>
+                      <leaf speciesLocation="36" geneName="CAGLA1_8_PE390"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>YEAST_XVXVI_PE94</name>
+                    <eventsRec>
+                      <leaf speciesLocation="37" geneName="YEAST_XVXVI_PE94"></leaf>
+                    </eventsRec>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+            <clade>
+              <name>10</name>
+              <eventsRec>
+                <speciation speciesLocation="49"></speciation>
+              </eventsRec>
+              <clade>
+                <name>PICPG_1_PE1495</name>
+                <eventsRec>
+                  <leaf speciesLocation="41" geneName="PICPG_1_PE1495"></leaf>
+                </eventsRec>
+              </clade>
+              <clade>
+                <name>12</name>
+                <eventsRec>
+                  <speciation speciesLocation="48"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>DEHAN1_5_PE65</name>
+                  <eventsRec>
+                    <leaf speciesLocation="42" geneName="DEHAN1_5_PE65"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>14</name>
+                  <eventsRec>
+                    <speciation speciesLocation="47"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>PISTI1_3_PE586</name>
+                    <eventsRec>
+                      <leaf speciesLocation="43" geneName="PISTI1_3_PE586"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>16</name>
+                    <eventsRec>
+                      <speciation speciesLocation="46"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>CANDC_3_PE246</name>
+                      <eventsRec>
+                        <leaf speciesLocation="44" geneName="CANDC_3_PE246"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>CANAW_4_PE230</name>
+                      <eventsRec>
+                        <leaf speciesLocation="45" geneName="CANAW_4_PE230"></leaf>
+                      </eventsRec>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+        </clade>
+      </clade>
+    </clade>
+  </phylogeny>
+  </recGeneTree>
+  <recGeneTree>
+    <phylogeny rooted="true">
+    <id>4</id>
+    <clade>
+      <name>0</name>
+      <eventsRec>
+        <speciation speciesLocation="54"></speciation>
+      </eventsRec>
+      <clade>
+        <name>1</name>
+        <eventsRec>
+          <speciation speciesLocation="4"></speciation>
+        </eventsRec>
+        <clade>
+          <name>3</name>
+          <eventsRec>
+            <speciationLoss speciesLocation="3"></speciationLoss>
+            <leaf speciesLocation="2" geneName="USMAY1_11_PE153"></leaf>
+          </eventsRec>
+        </clade>
+        <clade>
+          <name>PUCGT_4_PE382</name>
+          <eventsRec>
+            <leaf speciesLocation="0" geneName="PUCGT_4_PE382"></leaf>
+          </eventsRec>
+        </clade>
+      </clade>
+      <clade>
+        <name>2</name>
+        <eventsRec>
+          <speciation speciesLocation="53"></speciation>
+        </eventsRec>
+        <clade>
+          <name>SCHPO_2_PE801</name>
+          <eventsRec>
+            <leaf speciesLocation="5" geneName="SCHPO_2_PE801"></leaf>
+          </eventsRec>
+        </clade>
+        <clade>
+          <name>4</name>
+          <eventsRec>
+            <speciation speciesLocation="52"></speciation>
+          </eventsRec>
+          <clade>
+            <name>5</name>
+            <eventsRec>
+              <speciation speciesLocation="51"></speciation>
+            </eventsRec>
+            <clade>
+              <name>YALIP1_2_PE527</name>
+              <eventsRec>
+                <leaf speciesLocation="29" geneName="YALIP1_2_PE527"></leaf>
+              </eventsRec>
+            </clade>
+            <clade>
+              <name>30</name>
+              <eventsRec>
+                <speciation speciesLocation="50"></speciation>
+              </eventsRec>
+              <clade>
+                <name>31</name>
+                <eventsRec>
+                  <speciation speciesLocation="40"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>41</name>
+                  <eventsRec>
+                    <speciation speciesLocation="34"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>LACTH_6_PE733</name>
+                    <eventsRec>
+                      <leaf speciesLocation="30" geneName="LACTH_6_PE733"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>48</name>
+                    <eventsRec>
+                      <speciation speciesLocation="33"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>ASHGO_4_PE616</name>
+                      <eventsRec>
+                        <leaf speciesLocation="31" geneName="ASHGO_4_PE616"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>KLLAC1_7_PE715</name>
+                      <eventsRec>
+                        <leaf speciesLocation="32" geneName="KLLAC1_7_PE715"></leaf>
+                      </eventsRec>
+                    </clade>
+                  </clade>
+                </clade>
+                <clade>
+                  <name>42</name>
+                  <eventsRec>
+                    <speciation speciesLocation="39"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>19</name>
+                    <eventsRec>
+                      <speciationLoss speciesLocation="38"></speciationLoss>
+                      <leaf speciesLocation="37" geneName="YEAST_XVXV_PE251"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>ZYGRO_2_PE673</name>
+                    <eventsRec>
+                      <leaf speciesLocation="35" geneName="ZYGRO_2_PE673"></leaf>
+                    </eventsRec>
+                  </clade>
+                </clade>
+              </clade>
+              <clade>
+                <name>32</name>
+                <eventsRec>
+                  <speciation speciesLocation="49"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>PICPG_3_PE1025</name>
+                  <eventsRec>
+                    <leaf speciesLocation="41" geneName="PICPG_3_PE1025"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>34</name>
+                  <eventsRec>
+                    <speciation speciesLocation="48"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>DEHAN1_2_PE280</name>
+                    <eventsRec>
+                      <leaf speciesLocation="42" geneName="DEHAN1_2_PE280"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>36</name>
+                    <eventsRec>
+                      <speciation speciesLocation="47"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>PISTI1_1_PE484</name>
+                      <eventsRec>
+                        <leaf speciesLocation="43" geneName="PISTI1_1_PE484"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>38</name>
+                      <eventsRec>
+                        <speciation speciesLocation="46"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>CANAW_2_PE452</name>
+                        <eventsRec>
+                          <leaf speciesLocation="45" geneName="CANAW_2_PE452"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>CANDC_2_PE448</name>
+                        <eventsRec>
+                          <leaf speciesLocation="44" geneName="CANDC_2_PE448"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+          <clade>
+            <name>6</name>
+            <eventsRec>
+              <speciation speciesLocation="28"></speciation>
+            </eventsRec>
+            <clade>
+              <name>NEUCR_237_PE16</name>
+              <eventsRec>
+                <leaf speciesLocation="6" geneName="NEUCR_237_PE16"></leaf>
+              </eventsRec>
+            </clade>
+            <clade>
+              <name>8</name>
+              <eventsRec>
+                <speciation speciesLocation="27"></speciation>
+              </eventsRec>
+              <clade>
+                <name>PENCW_17_PE2221</name>
+                <eventsRec>
+                  <leaf speciesLocation="7" geneName="PENCW_17_PE2221"></leaf>
+                </eventsRec>
+              </clade>
+              <clade>
+                <name>10</name>
+                <eventsRec>
+                  <speciation speciesLocation="26"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>11</name>
+                  <eventsRec>
+                    <speciation speciesLocation="25"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>19</name>
+                    <eventsRec>
+                      <speciation speciesLocation="19"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>ASPTE_23_PE637</name>
+                      <eventsRec>
+                        <leaf speciesLocation="15" geneName="ASPTE_23_PE637"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>26</name>
+                      <eventsRec>
+                        <speciation speciesLocation="18"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>ASPFL_1_PE919</name>
+                        <eventsRec>
+                          <leaf speciesLocation="16" geneName="ASPFL_1_PE919"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>ASPOR_3_PE1258</name>
+                        <eventsRec>
+                          <leaf speciesLocation="17" geneName="ASPOR_3_PE1258"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                  <clade>
+                    <name>20</name>
+                    <eventsRec>
+                      <speciation speciesLocation="24"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>EMENI_40_PE1351</name>
+                      <eventsRec>
+                        <leaf speciesLocation="20" geneName="EMENI_40_PE1351"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>22</name>
+                      <eventsRec>
+                        <speciation speciesLocation="23"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>ASPNC_1_PE593</name>
+                        <eventsRec>
+                          <leaf speciesLocation="22" geneName="ASPNC_1_PE593"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>ASPNG_2_PE986</name>
+                        <eventsRec>
+                          <leaf speciesLocation="21" geneName="ASPNG_2_PE986"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+                <clade>
+                  <name>12</name>
+                  <eventsRec>
+                    <speciation speciesLocation="14"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>ASPCL_38_PE1429</name>
+                    <eventsRec>
+                      <leaf speciesLocation="8" geneName="ASPCL_38_PE1429"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>14</name>
+                    <eventsRec>
+                      <speciation speciesLocation="13"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>NEFIS1_162_PE1486</name>
+                      <eventsRec>
+                        <leaf speciesLocation="9" geneName="NEFIS1_162_PE1486"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>16</name>
+                      <eventsRec>
+                        <speciation speciesLocation="12"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>ASPFC_1_PE240</name>
+                        <eventsRec>
+                          <leaf speciesLocation="11" geneName="ASPFC_1_PE240"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>ASFUM1_1_PE165</name>
+                        <eventsRec>
+                          <leaf speciesLocation="10" geneName="ASFUM1_1_PE165"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+        </clade>
+      </clade>
+    </clade>
+    </phylogeny>
+  </recGeneTree>
+  <recGeneTree>
+  <phylogeny rooted="true">
+    <id>5</id>
+    <clade>
+      <name>0</name>
+      <eventsRec>
+        <speciation speciesLocation="54"></speciation>
+      </eventsRec>
+      <clade>
+        <name>1</name>
+        <eventsRec>
+          <speciation speciesLocation="4"></speciation>
+        </eventsRec>
+        <clade>
+          <name>PUCGT_78_PE84</name>
+          <eventsRec>
+            <leaf speciesLocation="0" geneName="PUCGT_78_PE84"></leaf>
+          </eventsRec>
+        </clade>
+        <clade>
+          <name>6</name>
+          <eventsRec>
+            <speciationLoss speciesLocation="3"></speciationLoss>
+            <duplication speciesLocation="1"></duplication>
+          </eventsRec>
+          <clade>
+            <name>CRYNJ_3_PE428</name>
+            <eventsRec>
+              <leaf speciesLocation="1" geneName="CRYNJ_3_PE428"></leaf>
+            </eventsRec>
+          </clade>
+          <clade>
+            <name>CRYNJ_3_PE429</name>
+            <eventsRec>
+              <leaf speciesLocation="1" geneName="CRYNJ_3_PE429"></leaf>
+            </eventsRec>
+          </clade>
+        </clade>
+      </clade>
+      <clade>
+        <name>59</name>
+        <eventsRec>
+          <speciationLoss speciesLocation="53"></speciationLoss>
+          <speciation speciesLocation="52"></speciation>
+        </eventsRec>
+        <clade>
+          <name>5</name>
+          <eventsRec>
+            <speciation speciesLocation="51"></speciation>
+          </eventsRec>
+          <clade>
+            <name>YALIP1_3_PE541</name>
+            <eventsRec>
+              <leaf speciesLocation="29" geneName="YALIP1_3_PE541"></leaf>
+            </eventsRec>
+          </clade>
+          <clade>
+            <name>30</name>
+            <eventsRec>
+              <speciation speciesLocation="50"></speciation>
+            </eventsRec>
+            <clade>
+              <name>31</name>
+              <eventsRec>
+                <speciation speciesLocation="40"></speciation>
+              </eventsRec>
+              <clade>
+                <name>44</name>
+                <eventsRec>
+                  <speciation speciesLocation="34"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>LACTH_5_PE30</name>
+                  <eventsRec>
+                    <leaf speciesLocation="30" geneName="LACTH_5_PE30"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>51</name>
+                  <eventsRec>
+                    <speciationOut speciesLocation="33"></speciationOut>
+                  </eventsRec>
+                  <clade>
+                    <name>16</name>
+                    <eventsRec>
+                      <transferBack destinationSpecies="35"></transferBack>
+                      <leaf speciesLocation="35" geneName="ZYGRO_2_PE690"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>53</name>
+                    <eventsRec>
+                      <speciation speciesLocation="33"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>ASHGO_6_PE531</name>
+                      <eventsRec>
+                        <leaf speciesLocation="31" geneName="ASHGO_6_PE531"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>KLLAC1_2_PE14</name>
+                      <eventsRec>
+                        <leaf speciesLocation="32" geneName="KLLAC1_2_PE14"></leaf>
+                      </eventsRec>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+              <clade>
+                <name>23</name>
+                <eventsRec>
+                  <speciationLoss speciesLocation="39"></speciationLoss>
+                  <speciation speciesLocation="38"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>YEAST_XVIX_PE21</name>
+                  <eventsRec>
+                    <leaf speciesLocation="37" geneName="YEAST_XVIX_PE21"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>CAGLA1_9_PE285</name>
+                  <eventsRec>
+                    <leaf speciesLocation="36" geneName="CAGLA1_9_PE285"></leaf>
+                  </eventsRec>
+                </clade>
+              </clade>
+            </clade>
+            <clade>
+              <name>32</name>
+              <eventsRec>
+                <speciation speciesLocation="49"></speciation>
+              </eventsRec>
+              <clade>
+                <name>PICPG_3_PE593</name>
+                <eventsRec>
+                  <leaf speciesLocation="41" geneName="PICPG_3_PE593"></leaf>
+                </eventsRec>
+              </clade>
+              <clade>
+                <name>34</name>
+                <eventsRec>
+                  <speciationOut speciesLocation="48"></speciationOut>
+                </eventsRec>
+                <clade>
+                  <name>28</name>
+                  <eventsRec>
+                    <transferBack destinationSpecies="5"></transferBack>
+                    <leaf speciesLocation="5" geneName="SCHPO_3_PE678"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>36</name>
+                  <eventsRec>
+                    <speciation speciesLocation="48"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>DEHAN1_3_PE354</name>
+                    <eventsRec>
+                      <leaf speciesLocation="42" geneName="DEHAN1_3_PE354"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>38</name>
+                    <eventsRec>
+                      <speciation speciesLocation="47"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>PISTI1_1_PE69</name>
+                      <eventsRec>
+                        <leaf speciesLocation="43" geneName="PISTI1_1_PE69"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>40</name>
+                      <eventsRec>
+                        <speciation speciesLocation="46"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>CANAW_5_PE51</name>
+                        <eventsRec>
+                          <leaf speciesLocation="45" geneName="CANAW_5_PE51"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>CANDC_4_PE593</name>
+                        <eventsRec>
+                          <leaf speciesLocation="44" geneName="CANDC_4_PE593"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+        </clade>
+        <clade>
+          <name>6</name>
+          <eventsRec>
+            <speciation speciesLocation="28"></speciation>
+          </eventsRec>
+          <clade>
+            <name>NEUCR_176_PE72</name>
+            <eventsRec>
+              <leaf speciesLocation="6" geneName="NEUCR_176_PE72"></leaf>
+            </eventsRec>
+          </clade>
+          <clade>
+            <name>8</name>
+            <eventsRec>
+              <speciation speciesLocation="27"></speciation>
+            </eventsRec>
+            <clade>
+              <name>PENCW_13_PE179</name>
+              <eventsRec>
+                <leaf speciesLocation="7" geneName="PENCW_13_PE179"></leaf>
+              </eventsRec>
+            </clade>
+            <clade>
+              <name>10</name>
+              <eventsRec>
+                <speciation speciesLocation="26"></speciation>
+              </eventsRec>
+              <clade>
+                <name>11</name>
+                <eventsRec>
+                  <speciation speciesLocation="14"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>ASPCL_38_PE873</name>
+                  <eventsRec>
+                    <leaf speciesLocation="8" geneName="ASPCL_38_PE873"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>24</name>
+                  <eventsRec>
+                    <speciation speciesLocation="13"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>NEFIS1_162_PE929</name>
+                    <eventsRec>
+                      <leaf speciesLocation="9" geneName="NEFIS1_162_PE929"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>26</name>
+                    <eventsRec>
+                      <speciation speciesLocation="12"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>ASFUM1_1_PE724</name>
+                      <eventsRec>
+                        <leaf speciesLocation="10" geneName="ASFUM1_1_PE724"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>ASPFC_1_PE806</name>
+                      <eventsRec>
+                        <leaf speciesLocation="11" geneName="ASPFC_1_PE806"></leaf>
+                      </eventsRec>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+              <clade>
+                <name>12</name>
+                <eventsRec>
+                  <speciation speciesLocation="25"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>13</name>
+                  <eventsRec>
+                    <speciation speciesLocation="19"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>ASPTE_5_PE11</name>
+                    <eventsRec>
+                      <leaf speciesLocation="15" geneName="ASPTE_5_PE11"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>20</name>
+                    <eventsRec>
+                      <speciation speciesLocation="18"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>ASPFL_1_PE1659</name>
+                      <eventsRec>
+                        <leaf speciesLocation="16" geneName="ASPFL_1_PE1659"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>ASPOR_3_PE608</name>
+                      <eventsRec>
+                        <leaf speciesLocation="17" geneName="ASPOR_3_PE608"></leaf>
+                      </eventsRec>
+                    </clade>
+                  </clade>
+                </clade>
+                <clade>
+                  <name>14</name>
+                  <eventsRec>
+                    <speciation speciesLocation="24"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>EMENI_40_PE209</name>
+                    <eventsRec>
+                      <leaf speciesLocation="20" geneName="EMENI_40_PE209"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>16</name>
+                    <eventsRec>
+                      <speciation speciesLocation="23"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>ASPNG_8_PE686</name>
+                      <eventsRec>
+                        <leaf speciesLocation="21" geneName="ASPNG_8_PE686"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>ASPNC_6_PE19</name>
+                      <eventsRec>
+                        <leaf speciesLocation="22" geneName="ASPNC_6_PE19"></leaf>
+                      </eventsRec>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+        </clade>
+      </clade>
+    </clade>
+  </phylogeny>
+  </recGeneTree>
+  <recGeneTree>
+  <phylogeny rooted="true">
+    <id>7</id>
+    <clade>
+      <name>0</name>
+      <eventsRec>
+        <speciation speciesLocation="18"></speciation>
+      </eventsRec>
+      <clade>
+        <name>ASPFL_1_PE737</name>
+        <eventsRec>
+          <leaf speciesLocation="16" geneName="ASPFL_1_PE737"></leaf>
+        </eventsRec>
+      </clade>
+      <clade>
+        <name>2</name>
+        <eventsRec>
+          <speciationOut speciesLocation="17"></speciationOut>
+        </eventsRec>
+        <clade>
+          <name>ASPOR_3_PE1416</name>
+          <eventsRec>
+            <leaf speciesLocation="17" geneName="ASPOR_3_PE1416"></leaf>
+          </eventsRec>
+        </clade>
+        <clade>
+          <name>42</name>
+          <eventsRec>
+            <transferBack destinationSpecies="52"></transferBack>
+            <speciation speciesLocation="52"></speciation>
+          </eventsRec>
+          <clade>
+            <name>6</name>
+            <eventsRec>
+              <speciationOut speciesLocation="51"></speciationOut>
+            </eventsRec>
+            <clade>
+              <name>7</name>
+              <eventsRec>
+                <transferBack destinationSpecies="2"></transferBack>
+                <leaf speciesLocation="2" geneName="USMAY1_3_PE102"></leaf>
+              </eventsRec>
+            </clade>
+            <clade>
+              <name>31</name>
+              <eventsRec>
+                <speciation speciesLocation="51"></speciation>
+              </eventsRec>
+              <clade>
+                <name>YALIP1_4_PE627</name>
+                <eventsRec>
+                  <leaf speciesLocation="29" geneName="YALIP1_4_PE627"></leaf>
+                </eventsRec>
+              </clade>
+              <clade>
+                <name>18</name>
+                <eventsRec>
+                  <speciationLoss speciesLocation="50"></speciationLoss>
+                  <speciation speciesLocation="49"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>PICPG_2_PE362</name>
+                  <eventsRec>
+                    <leaf speciesLocation="41" geneName="PICPG_2_PE362"></leaf>
+                  </eventsRec>
+                </clade>
+                <clade>
+                  <name>37</name>
+                  <eventsRec>
+                    <speciation speciesLocation="48"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>DEHAN1_1_PE370</name>
+                    <eventsRec>
+                      <leaf speciesLocation="42" geneName="DEHAN1_1_PE370"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>17</name>
+                    <eventsRec>
+                      <speciationLoss speciesLocation="47"></speciationLoss>
+                      <speciation speciesLocation="46"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>CANAW_4_PE51</name>
+                      <eventsRec>
+                        <leaf speciesLocation="45" geneName="CANAW_4_PE51"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>CANDC_3_PE54</name>
+                      <eventsRec>
+                        <leaf speciesLocation="44" geneName="CANDC_3_PE54"></leaf>
+                      </eventsRec>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+          <clade>
+            <name>7</name>
+            <eventsRec>
+              <speciation speciesLocation="28"></speciation>
+            </eventsRec>
+            <clade>
+              <name>NEUCR_124_PE99</name>
+              <eventsRec>
+                <leaf speciesLocation="6" geneName="NEUCR_124_PE99"></leaf>
+              </eventsRec>
+            </clade>
+            <clade>
+              <name>9</name>
+              <eventsRec>
+                <speciation speciesLocation="27"></speciation>
+              </eventsRec>
+              <clade>
+                <name>PENCW_10_PE935</name>
+                <eventsRec>
+                  <leaf speciesLocation="7" geneName="PENCW_10_PE935"></leaf>
+                </eventsRec>
+              </clade>
+              <clade>
+                <name>11</name>
+                <eventsRec>
+                  <speciation speciesLocation="26"></speciation>
+                </eventsRec>
+                <clade>
+                  <name>12</name>
+                  <eventsRec>
+                    <speciation speciesLocation="14"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>ASPCL_46_PE560</name>
+                    <eventsRec>
+                      <leaf speciesLocation="8" geneName="ASPCL_46_PE560"></leaf>
+                    </eventsRec>
+                  </clade>
+                  <clade>
+                    <name>25</name>
+                    <eventsRec>
+                      <speciation speciesLocation="13"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>NEFIS1_618_PE448</name>
+                      <eventsRec>
+                        <leaf speciesLocation="9" geneName="NEFIS1_618_PE448"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>27</name>
+                      <eventsRec>
+                        <speciation speciesLocation="12"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>ASPFC_3_PE414</name>
+                        <eventsRec>
+                          <leaf speciesLocation="11" geneName="ASPFC_3_PE414"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>ASFUM1_3_PE954</name>
+                        <eventsRec>
+                          <leaf speciesLocation="10" geneName="ASFUM1_3_PE954"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+                <clade>
+                  <name>13</name>
+                  <eventsRec>
+                    <speciation speciesLocation="25"></speciation>
+                  </eventsRec>
+                  <clade>
+                    <name>14</name>
+                    <eventsRec>
+                      <speciation speciesLocation="19"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>ASPTE_23_PE397</name>
+                      <eventsRec>
+                        <leaf speciesLocation="15" geneName="ASPTE_23_PE397"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>21</name>
+                      <eventsRec>
+                        <speciation speciesLocation="18"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>ASPOR_4_PE1250</name>
+                        <eventsRec>
+                          <leaf speciesLocation="17" geneName="ASPOR_4_PE1250"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>ASPFL_2_PE861</name>
+                        <eventsRec>
+                          <leaf speciesLocation="16" geneName="ASPFL_2_PE861"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                  <clade>
+                    <name>15</name>
+                    <eventsRec>
+                      <speciation speciesLocation="24"></speciation>
+                    </eventsRec>
+                    <clade>
+                      <name>EMENI_35_PE234</name>
+                      <eventsRec>
+                        <leaf speciesLocation="20" geneName="EMENI_35_PE234"></leaf>
+                      </eventsRec>
+                    </clade>
+                    <clade>
+                      <name>17</name>
+                      <eventsRec>
+                        <speciation speciesLocation="23"></speciation>
+                      </eventsRec>
+                      <clade>
+                        <name>ASPNC_2_PE683</name>
+                        <eventsRec>
+                          <leaf speciesLocation="22" geneName="ASPNC_2_PE683"></leaf>
+                        </eventsRec>
+                      </clade>
+                      <clade>
+                        <name>ASPNG_4_PE1835</name>
+                        <eventsRec>
+                          <leaf speciesLocation="21" geneName="ASPNG_4_PE1835"></leaf>
+                        </eventsRec>
+                      </clade>
+                    </clade>
+                  </clade>
+                </clade>
+              </clade>
+            </clade>
+          </clade>
+        </clade>
+      </clade>
+    </clade>
+  </phylogeny>
+</recGeneTree>
+</recPhylo>
+

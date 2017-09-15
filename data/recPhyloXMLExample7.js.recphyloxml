@@ -1,0 +1,35 @@
+
+<recPhylo  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns="http://phylariane.univ-lyon1.fr/recphyloxml"
+ xsi:schemaLocation="./recPhyloXML.xsd">
+  <spTree>
+    <phylogeny>
+      <clade>
+        <name>1</name>
+        <clade>
+          <name>2</name>
+        </clade>
+        <clade>
+          <name>3</name>
+          <clade>
+            <name>4</name>
+          </clade>
+          <clade>
+            <name>5</name>
+          </clade>
+        </clade>
+      </clade>
+    </phylogeny>
+  </spTree>
+  <recGeneTree>
+    <phylogeny rooted="true">
+      <clade>
+        <name>a</name>
+        <eventsRec>
+          <leaf speciesLocation="2"></leaf>
+        </eventsRec>
+      </clade>
+    </phylogeny>
+  </recGeneTree>
+</recPhylo>
+
